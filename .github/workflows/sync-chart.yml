@@ -77,16 +77,14 @@ jobs:
 
           echo "Current working directory: $(pwd)"
           ls -l
-          echo "Contents of parent directory:"
-          ls -l ../
+          echo "Contents of schema directory:"
+          ls -l ../schemas
 
           cd helm-charts/
           rm -rf nginx-ingress
 
           echo "Current working directory after helm-charts: $(pwd)"
           ls -l
-          echo "Contents of parent directory after helm-charts:"
-          ls -l ../
 
           helm pull oci://ghcr.io/nginx/charts/nginx-ingress --untar --version ${{ inputs.chart_version }}
           rm -f nginx-ingress/templates/clusterrole.yaml
@@ -110,10 +108,6 @@ jobs:
 
           new_nic_version=$(yq e '.appVersion' nginx-ingress/Chart.yaml)
           echo "New NIC version: $new_nic_version"
-
-          echo "Current working directory after new_nic_version: $(pwd)"
-          ls -l
-          ls -l ../
 
           echo current_nic_version=$current_nic_version >> $GITHUB_OUTPUT
           echo current_operator_version=$current_operator_version >> $GITHUB_OUTPUT
