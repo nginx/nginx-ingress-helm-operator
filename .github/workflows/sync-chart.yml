@@ -78,7 +78,7 @@ jobs:
           echo "Current working directory: $(pwd)"
           ls -l
           echo "Contents of schema directory:"
-          ls -l ../schemas
+          ls -l schemas/
 
           cd helm-charts/
           rm -rf nginx-ingress
