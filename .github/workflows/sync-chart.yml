@@ -20,6 +20,21 @@ on:
         type: boolean
         default: false
 
+  workflow_call:
+    inputs:
+      chart_version:
+        description: "Chart version, e.g. x.y.z"
+        type: string
+        required: true
+      operator_version:
+        description: "Operator version, e.g. x.y.z"
+        type: string
+        required: true
+      k8s_version:
+        description: "Kubernetes version, e.g. vx.y.z"
+        type: string
+        required: true
+
 permissions:
   contents: read
 
