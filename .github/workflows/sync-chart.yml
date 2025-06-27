@@ -34,6 +34,10 @@ on:
         description: "Kubernetes version, e.g. vx.y.z"
         type: string
         required: true
+      dry_run:
+        description: "Do not commit to a PR"
+        type: boolean
+        default: false  
 
 permissions:
   contents: read
