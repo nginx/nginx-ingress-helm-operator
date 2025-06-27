@@ -141,15 +141,14 @@ jobs:
         if: ${{ inputs.dry_run }}
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}
-          title: Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}
-          branch: feat/update-nic-to-${{ steps.sync.outputs.new_nic_version }}
-          body: |
-            This automated PR updates the NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}.
-            The Helm Chart was updated to ${{ inputs.chart_version }}.
-            The Operator was updated to ${{ inputs.operator_version }}.
-            Kubernetes was updated to ${{ inputs.k8s_version }}.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add -A
+          git commit -m "Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}"
+          git push
+          gh pr create --title "Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}" --body "This automated PR updates the NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}.
+          The Helm Chart was updated to ${{ inputs.chart_version }}.
+          The Operator was updated to ${{ inputs.operator_version }}.
+          Kubernetes was updated to ${{ inputs.k8s_version }}."
         if: ${{ ! inputs.dry_run }}
