@@ -146,6 +146,9 @@ jobs:
           GITHUB_EMAIL: ${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          git config --global user.name "${GITHUB_USERNAME}"
+          git config --global user.email "${GITHUB_EMAIL}"
+
           git add -A
           git commit -m "Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}"
           git push
