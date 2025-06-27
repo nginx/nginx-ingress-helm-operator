@@ -77,12 +77,16 @@ jobs:
 
           echo "Current working directory: $(pwd)"
           ls -l
+          echo "Contents of parent directory:"
+          ls -l ../
 
           cd helm-charts/
           rm -rf nginx-ingress
 
           echo "Current working directory after helm-charts: $(pwd)"
           ls -l
+          echo "Contents of parent directory after helm-charts:"
+          ls -l ../
 
           helm pull oci://ghcr.io/nginx/charts/nginx-ingress --untar --version ${{ inputs.chart_version }}
           rm -f nginx-ingress/templates/clusterrole.yaml
@@ -92,19 +96,24 @@ jobs:
 
           echo "Current working directory after nginx-ingress: $(pwd)"
           ls -l
+          echo "Contents of parent directory after nginx-ingress:"
+          ls -l ../
 
           mv ../schemas/${{ inputs.k8s_version }} nginx-ingress/${{ inputs.k8s_version }}
           sed -i -e "s#ref\":.*_def#ref\": \"file://./helm-charts/nginx-ingress/${{ inputs.k8s_version }}/_def#" nginx-ingress/values.schema.json
           rm -rf ../schemas
 
-          echo "Current working directory after schemas: $(pwd)"
+          echo "Current working directory after removing schema: $(pwd)"
           ls -l
+          echo "Contents of parent directory after removing schema:"
+          ls -l ../
 
           new_nic_version=$(yq e '.appVersion' nginx-ingress/Chart.yaml)
           echo "New NIC version: $new_nic_version"
 
           echo "Current working directory after new_nic_version: $(pwd)"
           ls -l
+          ls -l ../
 
           echo current_nic_version=$current_nic_version >> $GITHUB_OUTPUT
           echo current_operator_version=$current_operator_version >> $GITHUB_OUTPUT
