@@ -142,6 +142,8 @@ jobs:
 
       - name: Create Pull Request
         env:
+          GITHUB_USERNAME: ${{ github.actor }}
+          GITHUB_EMAIL: ${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add -A
