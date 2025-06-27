@@ -75,21 +75,36 @@ jobs:
           current_operator_version=$(egrep '^VERSION' Makefile  | awk '{ print $3 }')
           echo "Current Operator version: $current_operator_version"
 
+          echo "Current working directory: $(pwd)"
+          ls -l
+
           cd helm-charts/
           rm -rf nginx-ingress
+
+          echo "Current working directory after helm-charts: $(pwd)"
+          ls -l
 
           helm pull oci://ghcr.io/nginx/charts/nginx-ingress --untar --version ${{ inputs.chart_version }}
           rm -f nginx-ingress/templates/clusterrole.yaml
           rm -f nginx-ingress/templates/controller-role.yaml
           rm -f nginx-ingress/templates/controller-rolebinding.yaml
           sed -i '14s/name: {{ include "nginx-ingress.fullname" . }}/name: nginx-ingress-operator-nginx-ingress-admin/' nginx-ingress/templates/clusterrolebinding.yaml
-          
+
+          echo "Current working directory after nginx-ingress: $(pwd)"
+          ls -l
+
           mv ../schemas/${{ inputs.k8s_version }} nginx-ingress/${{ inputs.k8s_version }}
           sed -i -e "s#ref\":.*_def#ref\": \"file://./helm-charts/nginx-ingress/${{ inputs.k8s_version }}/_def#" nginx-ingress/values.schema.json
           rm -rf ../schemas
 
+          echo "Current working directory after schemas: $(pwd)"
+          ls -l
+
           new_nic_version=$(yq e '.appVersion' nginx-ingress/Chart.yaml)
           echo "New NIC version: $new_nic_version"
+
+          echo "Current working directory after new_nic_version: $(pwd)"
+          ls -l
 
           echo current_nic_version=$current_nic_version >> $GITHUB_OUTPUT
           echo current_operator_version=$current_operator_version >> $GITHUB_OUTPUT
