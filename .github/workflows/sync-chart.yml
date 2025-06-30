@@ -20,25 +20,6 @@ on:
         type: boolean
         default: false
 
-  workflow_call:
-    inputs:
-      chart_version:
-        description: "Chart version, e.g. x.y.z"
-        type: string
-        required: true
-      operator_version:
-        description: "Operator version, e.g. x.y.z"
-        type: string
-        required: true
-      k8s_version:
-        description: "Kubernetes version, e.g. vx.y.z"
-        type: string
-        required: true
-      dry_run:
-        description: "Do not commit to a PR"
-        type: boolean
-        default: false  
-
 permissions:
   contents: read
 
@@ -51,8 +32,6 @@ jobs:
     steps:
       - name: Checkout Operator
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          repository: nginx/nginx-ingress-helm-operator
 
       - name: Checkout Kubernetes json schemas
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -75,16 +54,8 @@ jobs:
           current_operator_version=$(egrep '^VERSION' Makefile  | awk '{ print $3 }')
           echo "Current Operator version: $current_operator_version"
 
-          echo "Current working directory: $(pwd)"
-          ls -l
-          echo "Contents of schema directory:"
-          ls -l schemas/
-
           cd helm-charts/
           rm -rf nginx-ingress
-
-          echo "Current working directory after helm-charts: $(pwd)"
-          ls -l
 
           helm pull oci://ghcr.io/nginx/charts/nginx-ingress --untar --version ${{ inputs.chart_version }}
           rm -f nginx-ingress/templates/clusterrole.yaml
@@ -92,19 +63,9 @@ jobs:
           rm -f nginx-ingress/templates/controller-rolebinding.yaml
           sed -i '14s/name: {{ include "nginx-ingress.fullname" . }}/name: nginx-ingress-operator-nginx-ingress-admin/' nginx-ingress/templates/clusterrolebinding.yaml
 
-          echo "Current working directory after nginx-ingress: $(pwd)"
-          ls -l
-          echo "Contents of parent directory after nginx-ingress:"
-          ls -l ../
-
           mv ../schemas/${{ inputs.k8s_version }} nginx-ingress/${{ inputs.k8s_version }}
           sed -i -e "s#ref\":.*_def#ref\": \"file://./helm-charts/nginx-ingress/${{ inputs.k8s_version }}/_def#" nginx-ingress/values.schema.json
           rm -rf ../schemas
-
-          echo "Current working directory after removing schema: $(pwd)"
-          ls -l
-          echo "Contents of parent directory after removing schema:"
-          ls -l ../
 
           new_nic_version=$(yq e '.appVersion' nginx-ingress/Chart.yaml)
           echo "New NIC version: $new_nic_version"
@@ -141,19 +102,15 @@ jobs:
         if: ${{ inputs.dry_run }}
 
       - name: Create Pull Request
-        env:
-          GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_EMAIL: ${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --global user.name "${GITHUB_USERNAME}"
-          git config --global user.email "${GITHUB_EMAIL}"
-
-          git add -A
-          git commit -m "Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}"
-          git push
-          gh pr create --title "Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}" --body "This automated PR updates the NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}.
-          The Helm Chart was updated to ${{ inputs.chart_version }}.
-          The Operator was updated to ${{ inputs.operator_version }}.
-          Kubernetes was updated to ${{ inputs.k8s_version }}."
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}
+          title: Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}
+          branch: feat/update-nic-to-${{ steps.sync.outputs.new_nic_version }}
+          body: |
+            This automated PR updates the NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}.
+            The Helm Chart was updated to ${{ inputs.chart_version }}.
+            The Operator was updated to ${{ inputs.operator_version }}.
+            Kubernetes was updated to ${{ inputs.k8s_version }}.
         if: ${{ ! inputs.dry_run }}
