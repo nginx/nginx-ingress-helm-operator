@@ -173,38 +173,39 @@ jobs:
               ./preflight check container quay.io/nginx/nginx-ingress-operator:${{ needs.build.outputs.version }} --pyxis-api-token ${{ secrets.PYXIS_API_TOKEN }} --certification-project-id ${{ secrets.CERTIFICATION_PROJECT_ID }} --platform $architecture --submit
           done
 
-      - name: Make
-        run: |
-          make bundle USE_IMAGE_DIGESTS=true
+      ## Disable PR creation until issues with NGINX_PAT are resolved
+      # - name: Make
+      #   run: |
+      #     make bundle USE_IMAGE_DIGESTS=true
 
-      - name: Checkout certified-operators repo
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          token: ${{ secrets.NGINX_PAT }}
-          repository: nginx-bot/certified-operators
-          path: certified-operators
+      # - name: Checkout certified-operators repo
+      #   uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      #   with:
+      #     token: ${{ secrets.NGINX_PAT }}
+      #     repository: nginx-bot/certified-operators
+      #     path: certified-operators
 
-      - name: Update certified-operators repo
-        working-directory: certified-operators/operators/nginx-ingress-operator
-        run: |
-          mkdir v${{ needs.build.outputs.version }}
-          cp -R ../../../bundle/manifests v${{ needs.build.outputs.version }}/
-          cp -R ../../../bundle/metadata v${{ needs.build.outputs.version }}/
+      # - name: Update certified-operators repo
+      #   working-directory: certified-operators/operators/nginx-ingress-operator
+      #   run: |
+      #     mkdir v${{ needs.build.outputs.version }}
+      #     cp -R ../../../bundle/manifests v${{ needs.build.outputs.version }}/
+      #     cp -R ../../../bundle/metadata v${{ needs.build.outputs.version }}/
 
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
-        with:
-          commit_message: operator nginx-ingress-operator (v${{ needs.build.outputs.version }})
-          commit_author: nginx-bot <integrations@nginx.com>
-          commit_user_name: nginx-bot
-          commit_user_email: integrations@nginx.com
-          create_branch: true
-          branch: update-nginx-ingress-operator-to-v${{ needs.build.outputs.version }}
-          repository: certified-operators
+      # - name: Commit changes
+      #   uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
+      #   with:
+      #     commit_message: operator nginx-ingress-operator (v${{ needs.build.outputs.version }})
+      #     commit_author: nginx-bot <integrations@nginx.com>
+      #     commit_user_name: nginx-bot
+      #     commit_user_email: integrations@nginx.com
+      #     create_branch: true
+      #     branch: update-nginx-ingress-operator-to-v${{ needs.build.outputs.version }}
+      #     repository: certified-operators
 
-      - name: Create PR
-        working-directory: certified-operators
-        run: |
-          gh pr create --title "operator nginx-ingress-operator (v${{ needs.build.outputs.version }})" --body "Update nginx-ingress-operator to v${{ needs.build.outputs.version }}" --head nginx-bot:update-nginx-ingress-operator-to-v${{ needs.build.outputs.version }} --base main --repo redhat-openshift-ecosystem/certified-operators
-        env:
-          GITHUB_TOKEN: ${{ secrets.NGINX_PAT }}
+      # - name: Create PR
+      #   working-directory: certified-operators
+      #   run: |
+      #     gh pr create --title "operator nginx-ingress-operator (v${{ needs.build.outputs.version }})" --body "Update nginx-ingress-operator to v${{ needs.build.outputs.version }}" --head nginx-bot:update-nginx-ingress-operator-to-v${{ needs.build.outputs.version }} --base main --repo redhat-openshift-ecosystem/certified-operators
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.NGINX_PAT }}
