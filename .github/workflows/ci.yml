@@ -79,7 +79,7 @@ jobs:
         with:
           images: |
             nginx/nginx-ingress-operator
-            ghcr.io/nginxinc/nginx-ingress-operator
+            ghcr.io/nginx/nginx-ingress-operator
             quay.io/nginx/nginx-ingress-operator
           tags: |
             type=edge

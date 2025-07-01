@@ -1,11 +1,11 @@
-[![Continuous Integration](https://github.com/nginxinc/nginx-ingress-helm-operator/workflows/Continuous%20Integration/badge.svg)](https://github.com/nginxinc/nginx-ingress-helm-operator/actions)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/nginxinc/nginx-ingress-helm-operator/badge)](https://api.securityscorecards.dev/projects/github.com/nginxinc/nginx-ingress-helm-operator)
+[![Continuous Integration](https://github.com/nginx/nginx-ingress-helm-operator/workflows/Continuous%20Integration/badge.svg)](https://github.com/nginx/nginx-ingress-helm-operator/actions)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/nginx/nginx-ingress-helm-operator/badge)](https://api.securityscorecards.dev/projects/github.com/nginx/nginx-ingress-helm-operator)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ![Commercial Support](https://badgen.net/badge/support/commercial/green?icon=awesome)
 
 # NGINX Ingress Operator
 
-The NGINX Ingress Operator is a Kubernetes/OpenShift component which deploys and manages one or more [NGINX/NGINX Plus Ingress Controllers](https://github.com/nginxinc/kubernetes-ingress) which in turn handle Ingress traffic for applications running in a cluster.
+The NGINX Ingress Operator is a Kubernetes/OpenShift component which deploys and manages one or more [NGINX/NGINX Plus Ingress Controllers](https://github.com/nginx/kubernetes-ingress) which in turn handle Ingress traffic for applications running in a cluster.
 
 Learn more about operators in the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).
 
@@ -46,11 +46,11 @@ Note: The NGINX Ingress Operator works only for NGINX Ingress Controller version
 
 1. Install the NGINX Ingress Operator. See [docs](./docs/installation.md).
    <br> NOTE: To use TransportServers as part of your NGINX Ingress Controller configuration, a GlobalConfiguration resource must be created _before_ starting the Operator - [see the notes](./examples/deployment-oss-min/README.md#TransportServers)
-2. Creating the default-server-secret.yaml is optional and it is recommended that users provide their own certificate. An example yaml for this can be found in the [examples folder](https://github.com/nginxinc/nginx-ingress-helm-operator/blob/main/examples/default-server-secret.yaml)
+2. Creating the default-server-secret.yaml is optional and it is recommended that users provide their own certificate. An example yaml for this can be found in the [examples folder](https://github.com/nginx/nginx-ingress-helm-operator/blob/main/examples/default-server-secret.yaml)
 3. (If using OpenShift) Create the scc resource on the cluster by applying the scc.yaml file found in the `resources` folder of this repo:
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/nginxinc/nginx-ingress-helm-operator/main/resources/scc.yaml
+   kubectl apply -f https://raw.githubusercontent.com/nginx/nginx-ingress-helm-operator/main/resources/scc.yaml
    ```
 
 4. Deploy a new NGINX Ingress Controller using the [NginxIngress](./config/samples/charts_v1alpha1_nginxingress.yaml) Custom Resource:
@@ -76,9 +76,9 @@ See [upgrade docs](./docs/upgrades.md)
 
 ## NGINX Ingress Operator Releases
 
-We publish NGINX Ingress Operator releases on GitHub. See our [releases page](https://github.com/nginxinc/nginx-ingress-helm-operator/releases).
+We publish NGINX Ingress Operator releases on GitHub. See our [releases page](https://github.com/nginx/nginx-ingress-helm-operator/releases).
 
-The latest stable release is [3.1.0](https://github.com/nginxinc/nginx-ingress-helm-operator/releases/tag/v3.1.0). For production use, we recommend that you choose the latest stable release.
+The latest stable release is [3.1.0](https://github.com/nginx/nginx-ingress-helm-operator/releases/tag/v3.1.0). For production use, we recommend that you choose the latest stable release.
 
 ## Development
 
