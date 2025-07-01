@@ -240,7 +240,7 @@ metadata:
     operatorframework.io/suggested-namespace: nginx-ingress
     operators.operatorframework.io/builder: operator-sdk-v1.40.0
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-    repository: https://github.com/nginxinc/nginx-ingress-helm-operator
+    repository: https://github.com/nginx/nginx-ingress-helm-operator
     support: NGINX Inc.
   labels:
     operatorframework.io/arch.amd64: supported
@@ -519,7 +519,7 @@ spec:
   - openshift
   links:
   - name: Nginx Ingress Operator
-    url: https://github.com/nginxinc/nginx-ingress-helm-operator
+    url: https://github.com/nginx/nginx-ingress-helm-operator
   maintainers:
   - email: kubernetes@nginx.com
     name: NGINX Inc
