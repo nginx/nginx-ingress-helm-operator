@@ -94,8 +94,8 @@ jobs:
 
           echo "Current working directory after nginx-ingress: $(pwd)"
           ls -l
-          echo "Contents of parent directory after nginx-ingress:"
-          ls -l ../
+          echo "Contents of schemas directory:"
+          ls -l ../schemas
 
           mv ../schemas/${{ inputs.k8s_version }} nginx-ingress/${{ inputs.k8s_version }}
           sed -i -e "s#ref\":.*_def#ref\": \"file://./helm-charts/nginx-ingress/${{ inputs.k8s_version }}/_def#" nginx-ingress/values.schema.json
