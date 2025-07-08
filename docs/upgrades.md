@@ -44,7 +44,7 @@ Deploy the operator following the steps outlined in [manual installation doc](./
 
 Uninstall the existing operator deployment:
 
-1. Checkout the previous version of the nginx-ingress-operator [0.5.1](https://github.com/nginxinc/nginx-ingress-helm-operator/releases/tag/v0.5.1).
+1. Checkout the previous version of the nginx-ingress-operator [0.5.1](https://github.com/nginx /nginx-ingress-helm-operator/releases/tag/v0.5.1).
 2. Uninstall the resources by running the following command:
 
     ```shell

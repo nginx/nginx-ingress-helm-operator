@@ -91,12 +91,6 @@ jobs:
           rm -f nginx-ingress/templates/controller-role.yaml
           rm -f nginx-ingress/templates/controller-rolebinding.yaml
           sed -i '14s/name: {{ include "nginx-ingress.fullname" . }}/name: nginx-ingress-operator-nginx-ingress-admin/' nginx-ingress/templates/clusterrolebinding.yaml
-
-          echo "Current working directory after nginx-ingress: $(pwd)"
-          ls -l
-          echo "Contents of schemas directory:"
-          ls -l ../schemas
-
           mv ../schemas/${{ inputs.k8s_version }} nginx-ingress/${{ inputs.k8s_version }}
           sed -i -e "s#ref\":.*_def#ref\": \"file://./helm-charts/nginx-ingress/${{ inputs.k8s_version }}/_def#" nginx-ingress/values.schema.json
           rm -rf ../schemas

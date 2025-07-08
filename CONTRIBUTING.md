@@ -17,9 +17,9 @@ The following is a set of guidelines for contributing to the NGINX Ingress Opera
 
 ## Ask a Question
 
-To ask a question please use [Github Discussions](https://github.com/nginxinc/kubernetes-ingress/discussions).
+To ask a question please use [Github Discussions](https://github.com/nginx/kubernetes-ingress/discussions).
 
-You can also join our [Community Slack](https://community.nginx.org/joinslack) which has a wider NGINX audience.
+You can also get help through the [NGINX Community Forum](https://community.nginx.org/).
 
 Please reserve GitHub issues for feature requests and bugs rather than general questions.
 
@@ -27,7 +27,7 @@ Please reserve GitHub issues for feature requests and bugs rather than general q
 
 Follow our [Installation Guide](docs/installation.md) to get the NGINX Ingress Operator up and running.
 
-Read the [documentation](https://github.com/nginxinc/nginx-ingress-helm-operator/tree/main/docs) .
+Read the [documentation](https://github.com/nginx/nginx-ingress-helm-operator/tree/main/docs) .
 
 ### Project Structure
 

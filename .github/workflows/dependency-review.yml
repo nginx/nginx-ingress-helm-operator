@@ -24,4 +24,4 @@ jobs:
       - name: "Dependency Review"
         uses: actions/dependency-review-action@da24556b548a50705dd671f47852072ea4c105d9 # v4.7.1
         with:
-          config-file: "nginxinc/k8s-common/dependency-review-config.yml@main"
+          config-file: "nginx/k8s-common/dependency-review-config.yml@main"
