@@ -1,4 +1,4 @@
-FROM quay.io/operator-framework/helm-operator:v1.40.0
+FROM quay.io/operator-framework/helm-operator:v1.41.0
 
 ENV HOME=/opt/helm
 COPY watches.yaml ${HOME}/watches.yaml
