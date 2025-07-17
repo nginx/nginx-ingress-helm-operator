@@ -143,6 +143,7 @@ jobs:
           git config --global user.name "${GITHUB_USERNAME}"
           git config --global user.email "${GITHUB_EMAIL}"
 
+          git checkout -b update-nic-to-${{ steps.sync.outputs.new_nic_version }}
           git add -A
           git commit -m "Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}"
           git push
