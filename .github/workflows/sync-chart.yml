@@ -143,9 +143,10 @@ jobs:
           git config --global user.name "${GITHUB_USERNAME}"
           git config --global user.email "${GITHUB_EMAIL}"
 
+          git checkout -b update-nic-to-${{ steps.sync.outputs.new_nic_version }}
           git add -A
           git commit -m "Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}"
-          git push
+          git push origin update-nic-to-${{ steps.sync.outputs.new_nic_version }}
           gh pr create --title "Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}" --body "This automated PR updates the NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}.
           The Helm Chart was updated to ${{ inputs.chart_version }}.
           The Operator was updated to ${{ inputs.operator_version }}.

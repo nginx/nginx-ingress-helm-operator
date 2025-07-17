@@ -14,4 +14,4 @@ name: nginx-ingress
 sources:
 - https://github.com/nginx/kubernetes-ingress/tree/v5.1.0/charts/nginx-ingress
 type: application
-version: 2.2.0
+version: 2.2.1
