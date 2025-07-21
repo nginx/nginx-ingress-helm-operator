@@ -1,14 +1,16 @@
 name: E2E Test
 
 on:
+  schedule:
+    - cron: '00 03 * * *'
   push:
     branches:
       - main
-      - feat/add-install-workflow
   pull_request:
     branches:
       - main
   workflow_dispatch: # Allow manual triggering
+  workflow_call: # Allow being called by other workflows
 
 concurrency:
   group: ${{ github.ref_name }}-e2e
