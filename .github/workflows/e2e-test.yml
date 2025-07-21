@@ -74,6 +74,20 @@ jobs:
           kubectl apply -f examples/deployment-oss-min/ns.yaml
           kubectl apply -f examples/deployment-oss-min/nginx-ingress-controller.yaml
           
+          # Wait for the operator to process the NginxIngress resource and create the deployment
+          echo "Waiting for operator to create the deployment..."
+          for i in {1..30}; do
+            if kubectl get deployment my-nginx-ingress-controller -n my-nginx-ingress >/dev/null 2>&1; then
+              echo "Deployment found after $i attempts"
+              break
+            fi
+            echo "Attempt $i: Deployment not found yet, waiting..."
+            sleep 10
+          done
+          
+          # Verify the deployment exists
+          kubectl get deployment my-nginx-ingress-controller -n my-nginx-ingress || exit 1
+          
           # Wait for the NGINX Ingress Controller to be ready
           kubectl wait --for=condition=Available --timeout=300s deployment/my-nginx-ingress-controller -n my-nginx-ingress
 
