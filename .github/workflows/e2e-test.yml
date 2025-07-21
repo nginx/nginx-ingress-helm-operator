@@ -9,21 +9,6 @@ on:
     branches:
       - main
   workflow_dispatch: # Allow manual triggering
-    inputs:
-      minikube_version:
-        description: 'Minikube version (e.g., v1.35.0)'
-        required: false
-        default: 'v1.35.0'
-        type: string
-      kubernetes_version:
-        description: 'Kubernetes version (e.g., v1.33.1)'
-        required: false
-        default: 'v1.33.1'
-        type: string
-
-env:
-  MINIKUBE_VERSION: ${{ inputs.minikube_version || 'v1.35.0' }}
-  KUBERNETES_VERSION: ${{ inputs.kubernetes_version || 'v1.33.1' }}
 
 concurrency:
   group: ${{ github.ref_name }}-e2e
@@ -39,6 +24,18 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Get Latest Versions
+        run: |
+          # Get latest Kubernetes version
+          LATEST_K8S=$(curl -s https://api.github.com/repos/kubernetes/kubernetes/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          echo "Latest Kubernetes version: $LATEST_K8S"
+          echo "KUBERNETES_VERSION=$LATEST_K8S" >> $GITHUB_ENV
+          
+          # Get latest Minikube version
+          LATEST_MINIKUBE=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          echo "Latest Minikube version: $LATEST_MINIKUBE"
+          echo "MINIKUBE_VERSION=$LATEST_MINIKUBE" >> $GITHUB_ENV
 
       - name: Install kubectl
         run: |
@@ -105,6 +102,8 @@ jobs:
           
           if [ -n "$DEPLOYMENT_NAME" ]; then
             echo "Found deployment: $DEPLOYMENT_NAME"
+            # Export for use in subsequent steps
+            echo "DEPLOYMENT_NAME=$DEPLOYMENT_NAME" >> $GITHUB_ENV
             # Wait for the NGINX Ingress Controller to be ready
             kubectl wait --for=condition=Available --timeout=300s deployment/$DEPLOYMENT_NAME -n nginx-ingress
           else
@@ -130,8 +129,6 @@ jobs:
 
       - name: Verify NGINX Configuration
         run: |
-          # Get the deployment name dynamically
-          DEPLOYMENT_NAME=$(kubectl get deployments -n nginx-ingress -o jsonpath='{.items[0].metadata.name}')
           echo "Testing NGINX configuration for deployment: $DEPLOYMENT_NAME"
           
           # Check NGINX configuration is valid
@@ -144,7 +141,13 @@ jobs:
           kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system --tail=100 || true
           
           echo "=== NGINX Ingress Controller Logs ==="
-          kubectl logs --all-containers -n nginx-ingress --tail=100 || true
+          # Get logs from all pods in nginx-ingress namespace
+          for pod in $(kubectl get pods -n nginx-ingress -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || echo ""); do
+            if [ -n "$pod" ]; then
+              echo "--- Logs for pod: $pod ---"
+              kubectl logs $pod -n nginx-ingress --tail=50 || true
+            fi
+          done
 
       - name: Cleanup
         if: always()
