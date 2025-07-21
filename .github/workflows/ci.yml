@@ -11,7 +11,7 @@ on:
       - main
 
 env:
-  platforms: "linux/amd64,linux/arm64,linux/ppc64le,linux/s390x"
+  platforms: "linux/amd64,linux/arm64"
 
 concurrency:
   group: ${{ github.ref_name }}-ci
@@ -60,7 +60,7 @@ jobs:
       - name: Setup QEMU
         uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
         with:
-          platforms: arm64,ppc64le,s390x
+          platforms: arm64
         if: github.event_name != 'pull_request'
 
       - name: Docker Buildx
@@ -136,7 +136,7 @@ jobs:
         if: always()
 
       - name: Create/Update Draft
-        uses: lucacome/draft-release@38def8b74645796e9743b53e0f187d4a8915ea3e # v1.2.3
+        uses: lucacome/draft-release@00f74370c044c322da6cb52acc707d62c7762c71 # v1.2.4
         with:
           minor-label: "enhancement"
           major-label: "change"

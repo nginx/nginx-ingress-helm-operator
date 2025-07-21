@@ -223,8 +223,8 @@ metadata:
     capabilities: Basic Install
     categories: Monitoring, Networking
     certified: "true"
-    containerImage: quay.io/nginx/nginx-ingress-operator:3.2.0
-    createdAt: "2025-06-19T11:37:21Z"
+    containerImage: quay.io/nginx/nginx-ingress-operator:3.2.1
+    createdAt: "2025-07-14T09:46:03Z"
     description: The NGINX Ingress Operator is a Kubernetes/OpenShift component which
       deploys and manages one or more NGINX/NGINX Plus Ingress Controllers
     features.operators.openshift.io/cnf: "false"
@@ -245,9 +245,7 @@ metadata:
   labels:
     operatorframework.io/arch.amd64: supported
     operatorframework.io/arch.arm64: supported
-    operatorframework.io/arch.ppc64le: supported
-    operatorframework.io/arch.s390x: supported
-  name: nginx-ingress-operator.v3.2.0
+  name: nginx-ingress-operator.v3.2.1
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -435,8 +433,6 @@ spec:
                         values:
                         - amd64
                         - arm64
-                        - ppc64le
-                        - s390x
                       - key: kubernetes.io/os
                         operator: In
                         values:
@@ -470,7 +466,7 @@ spec:
                 - --metrics-bind-address=127.0.0.1:8080
                 - --leader-elect
                 - --leader-election-id=nginx-ingress-operator
-                image: quay.io/nginx/nginx-ingress-operator:3.2.0
+                image: quay.io/nginx/nginx-ingress-operator:3.2.1
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -527,4 +523,4 @@ spec:
   minKubeVersion: 1.26.0
   provider:
     name: NGINX Inc
-  version: 3.2.0
+  version: 3.2.1
