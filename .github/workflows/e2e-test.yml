@@ -84,13 +84,33 @@ jobs:
           # Create the namespace and NGINX Ingress Controller instance in namespace nginx-ingress
           kubectl create namespace nginx-ingress
           kubectl apply -f tests/nginx-ingress-controller-oss.yaml
-          sleep 10
-
-          # Verify the deployment exists
-          kubectl get deployment my-nginx-ingress -n nginx-ingress
-
-          # Wait for the NGINX Ingress Controller to be ready
-          kubectl wait --for=condition=Available --timeout=300s deployment/my-nginx-ingress -n nginx-ingress
+          
+          # Wait for the operator to process and install the Helm release
+          echo "Waiting for operator to install Helm release..."
+          sleep 30
+          
+          # Check what deployments were actually created
+          echo "Checking deployments in nginx-ingress namespace:"
+          kubectl get deployments -n nginx-ingress
+          
+          # Find the actual deployment name
+          DEPLOYMENT_NAME=$(kubectl get deployments -n nginx-ingress -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
+          
+          if [ -z "$DEPLOYMENT_NAME" ]; then
+            echo "No deployment found, waiting longer..."
+            sleep 30
+            kubectl get deployments -n nginx-ingress
+            DEPLOYMENT_NAME=$(kubectl get deployments -n nginx-ingress -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
+          fi
+          
+          if [ -n "$DEPLOYMENT_NAME" ]; then
+            echo "Found deployment: $DEPLOYMENT_NAME"
+            # Wait for the NGINX Ingress Controller to be ready
+            kubectl wait --for=condition=Available --timeout=300s deployment/$DEPLOYMENT_NAME -n nginx-ingress
+          else
+            echo "Failed to find any deployment in nginx-ingress namespace"
+            exit 1
+          fi
       - name: Verify NGINX Ingress Controller Deployment
         run: |
           # Check all resources in the nginx ingress controller namespace
@@ -110,8 +130,12 @@ jobs:
 
       - name: Verify NGINX Configuration
         run: |
+          # Get the deployment name dynamically
+          DEPLOYMENT_NAME=$(kubectl get deployments -n nginx-ingress -o jsonpath='{.items[0].metadata.name}')
+          echo "Testing NGINX configuration for deployment: $DEPLOYMENT_NAME"
+          
           # Check NGINX configuration is valid
-          kubectl exec deployment/my-nginx-ingress -- nginx -t
+          kubectl exec -n nginx-ingress deployment/$DEPLOYMENT_NAME -- nginx -t
 
       - name: Check Operator and Controller Logs
         if: always()
