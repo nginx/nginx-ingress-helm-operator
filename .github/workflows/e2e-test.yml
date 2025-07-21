@@ -9,10 +9,21 @@ on:
     branches:
       - main
   workflow_dispatch: # Allow manual triggering
+    inputs:
+      minikube_version:
+        description: 'Minikube version (e.g., v1.35.0)'
+        required: false
+        default: 'v1.35.0'
+        type: string
+      kubernetes_version:
+        description: 'Kubernetes version (e.g., v1.33.1)'
+        required: false
+        default: 'v1.33.1'
+        type: string
 
 env:
-  MINIKUBE_VERSION: "v1.35.0"
-  KUBERNETES_VERSION: "v1.33.1"
+  MINIKUBE_VERSION: ${{ inputs.minikube_version || 'v1.35.0' }}
+  KUBERNETES_VERSION: ${{ inputs.kubernetes_version || 'v1.33.1' }}
 
 concurrency:
   group: ${{ github.ref_name }}-e2e
@@ -71,13 +82,12 @@ jobs:
       - name: Deploy Example NGINX Ingress Controller
         run: |
           # Create the namespace and NGINX Ingress Controller instance using OSS minimal example
-          kubectl apply -f examples/deployment-oss-min/ns.yaml
-          kubectl apply -f examples/deployment-oss-min/nginx-ingress-controller.yaml
+          kubectl apply -f tests/nginx-ingress-controller-oss.yaml
           
           # Wait for the operator to process the NginxIngress resource and create the deployment
           echo "Waiting for operator to create the deployment..."
           for i in {1..30}; do
-            if kubectl get deployment my-nginx-ingress-controller -n my-nginx-ingress >/dev/null 2>&1; then
+            if kubectl get deployment my-nginx-ingress >/dev/null 2>&1; then
               echo "Deployment found after $i attempts"
               break
             fi
@@ -86,11 +96,10 @@ jobs:
           done
           
           # Verify the deployment exists
-          kubectl get deployment my-nginx-ingress-controller -n my-nginx-ingress || exit 1
+          kubectl get deployment my-nginx-ingress || exit 1
           
           # Wait for the NGINX Ingress Controller to be ready
-          kubectl wait --for=condition=Available --timeout=300s deployment/my-nginx-ingress-controller -n my-nginx-ingress
-
+          kubectl wait --for=condition=Available --timeout=300s deployment/my-nginx-ingress 
       - name: Verify NGINX Ingress Controller Deployment
         run: |
           # Check all resources in the nginx ingress controller namespace
@@ -122,28 +131,8 @@ jobs:
           echo "=== NGINX Ingress Controller Logs ==="
           kubectl logs -l app.kubernetes.io/name=nginx-ingress -n my-nginx-ingress --tail=100 || true
 
-      - name: Collect Debug Information
-        if: failure()
-        run: |
-          echo "=== Cluster Information ==="
-          kubectl cluster-info dump --output-directory=/tmp/cluster-dump || true
-          
-          echo "=== All Pods ==="
-          kubectl get pods -A || true
-          
-          echo "=== Events ==="
-          kubectl get events -A --sort-by='.lastTimestamp' || true
-          
-          echo "=== Operator CRDs ==="
-          kubectl get crd | grep nginx || true
-          
-          echo "=== NginxIngress Resources ==="
-          kubectl get nginxingresses.charts.nginx.org -A || true
-
       - name: Cleanup
         if: always()
         run: |
-          # Clean up resources
-          kubectl delete -f examples/deployment-oss-min/nginx-ingress-controller.yaml --ignore-not-found=true
-          kubectl delete -f examples/deployment-oss-min/ns.yaml --ignore-not-found=true
-          kubectl delete -f config/default --ignore-not-found=true || true
+          # Delete the Minikube cluster
+          minikube delete

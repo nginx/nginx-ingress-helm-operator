@@ -1,0 +1,21 @@
+apiVersion: charts.nginx.org/v1alpha1
+kind: NginxIngress
+metadata:
+  name: my-nginx-ingress
+spec:
+  controller:
+    defaultTLS:
+      secret: ""
+    enableCustomResources: true
+    image:
+      pullPolicy: Always
+      repository: nginx/nginx-ingress
+      tag: 5.1.0
+    ingressClass:
+      name: nginx
+    kind: deployment
+    nginxplus: false
+    service:
+      type: NodePort
+  rbac:
+    create: true
