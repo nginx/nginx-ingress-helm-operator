@@ -51,21 +51,10 @@ jobs:
           kubectl get nodes
           kubectl get pods -A
 
-      - name: Build Operator Image
-        run: |
-          # Build the operator image with edge tag
-          docker build -t nginx/nginx-ingress-operator:edge .
-          
-          # Load the image into minikube
-          minikube image load nginx/nginx-ingress-operator:edge
-
       - name: Deploy NGINX Ingress Operator
         run: |
-          # Deploy the operator using kubectl and kustomize
-          kubectl apply -k config/default
-          
-          # Update the image to use the edge version we built
-          kubectl patch deployment nginx-ingress-operator-controller-manager -n nginx-ingress-operator-system -p '{"spec":{"template":{"spec":{"containers":[{"name":"manager","image":"nginx/nginx-ingress-operator:edge"}]}}}}'
+          # Deploy the operator using make deploy with edge image - strictly following manual installation docs
+          make deploy IMG=nginx/nginx-ingress-operator:edge
           
           # Wait for the operator to be ready
           kubectl wait --for=condition=Available --timeout=300s deployment/nginx-ingress-operator-controller-manager -n nginx-ingress-operator-system
@@ -79,14 +68,10 @@ jobs:
           # Check operator logs
           kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system --tail=50
 
-      - name: Create Namespace for NGINX Ingress Controller
-        run: |
-          # Create namespace from examples
-          kubectl apply -f examples/ns.yaml
-
       - name: Deploy Example NGINX Ingress Controller
         run: |
-          # Create the NGINX Ingress Controller instance using OSS minimal example
+          # Create the namespace and NGINX Ingress Controller instance using OSS minimal example
+          kubectl apply -f examples/deployment-oss-min/ns.yaml
           kubectl apply -f examples/deployment-oss-min/nginx-ingress-controller.yaml
           
           # Wait for the NGINX Ingress Controller to be ready
@@ -101,7 +86,7 @@ jobs:
           kubectl get pods -n my-nginx-ingress -l app.kubernetes.io/name=nginx-ingress
           
           # Check the service
-          kubectl get service my-nginx-ingress-controller -n my-nginx-ingress
+          kubectl get services -n my-nginx-ingress
           
           # Check ingress class
           kubectl get ingressclass
@@ -146,5 +131,5 @@ jobs:
         run: |
           # Clean up resources
           kubectl delete -f examples/deployment-oss-min/nginx-ingress-controller.yaml --ignore-not-found=true
-          kubectl delete -f examples/ns.yaml --ignore-not-found=true
+          kubectl delete -f examples/deployment-oss-min/ns.yaml --ignore-not-found=true
           kubectl delete -f config/default --ignore-not-found=true || true
