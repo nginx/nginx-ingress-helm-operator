@@ -1,0 +1,149 @@
+name: E2E Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  MINIKUBE_VERSION: "v1.35.0"
+  KUBERNETES_VERSION: "v1.33.1"
+
+concurrency:
+  group: ${{ github.ref_name }}-e2e
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-test:
+    name: End-to-End Test
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/${{ env.KUBERNETES_VERSION }}/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: Install Minikube
+        run: |
+          curl -Lo minikube https://storage.googleapis.com/minikube/releases/${{ env.MINIKUBE_VERSION }}/minikube-linux-amd64
+          chmod +x minikube
+          sudo mv minikube /usr/local/bin/
+
+      - name: Start Minikube
+        run: |
+          minikube start --kubernetes-version=${{ env.KUBERNETES_VERSION }} --driver=docker --memory=4g --cpus=2
+
+      - name: Verify Kubernetes cluster
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+          kubectl get pods -A
+
+      - name: Build Operator Image
+        run: |
+          # Build the operator image with edge tag
+          docker build -t nginx/nginx-ingress-operator:edge .
+          
+          # Load the image into minikube
+          minikube image load nginx/nginx-ingress-operator:edge
+
+      - name: Deploy NGINX Ingress Operator
+        run: |
+          # Deploy the operator using kubectl and kustomize
+          kubectl apply -k config/default
+          
+          # Update the image to use the edge version we built
+          kubectl patch deployment nginx-ingress-operator-controller-manager -n nginx-ingress-operator-system -p '{"spec":{"template":{"spec":{"containers":[{"name":"manager","image":"nginx/nginx-ingress-operator:edge"}]}}}}'
+          
+          # Wait for the operator to be ready
+          kubectl wait --for=condition=Available --timeout=300s deployment/nginx-ingress-operator-controller-manager -n nginx-ingress-operator-system
+
+      - name: Verify Operator Deployment
+        run: |
+          # Check operator deployment status
+          kubectl get deployments -n nginx-ingress-operator-system
+          kubectl get pods -n nginx-ingress-operator-system
+          
+          # Check operator logs
+          kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system --tail=50
+
+      - name: Create Namespace for NGINX Ingress Controller
+        run: |
+          # Create namespace from examples
+          kubectl apply -f examples/ns.yaml
+
+      - name: Deploy Example NGINX Ingress Controller
+        run: |
+          # Create the NGINX Ingress Controller instance using OSS minimal example
+          kubectl apply -f examples/deployment-oss-min/nginx-ingress-controller.yaml
+          
+          # Wait for the NGINX Ingress Controller to be ready
+          kubectl wait --for=condition=Available --timeout=300s deployment/my-nginx-ingress-controller -n my-nginx-ingress
+
+      - name: Verify NGINX Ingress Controller Deployment
+        run: |
+          # Check all resources in the nginx ingress controller namespace
+          kubectl get all -n my-nginx-ingress
+          
+          # Check if the controller pod is running
+          kubectl get pods -n my-nginx-ingress -l app.kubernetes.io/name=nginx-ingress
+          
+          # Check the service
+          kubectl get service my-nginx-ingress-controller -n my-nginx-ingress
+          
+          # Check ingress class
+          kubectl get ingressclass
+          
+          # Verify controller is ready
+          kubectl wait --for=condition=Ready --timeout=60s pod -l app.kubernetes.io/name=nginx-ingress -n my-nginx-ingress
+
+      - name: Verify NGINX Configuration
+        run: |
+          # Check NGINX configuration is valid
+          kubectl exec -n my-nginx-ingress deployment/my-nginx-ingress-controller -- nginx -t
+
+      - name: Check Operator and Controller Logs
+        if: always()
+        run: |
+          echo "=== Operator Logs ==="
+          kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system --tail=100 || true
+          
+          echo "=== NGINX Ingress Controller Logs ==="
+          kubectl logs -l app.kubernetes.io/name=nginx-ingress -n my-nginx-ingress --tail=100 || true
+
+      - name: Collect Debug Information
+        if: failure()
+        run: |
+          echo "=== Cluster Information ==="
+          kubectl cluster-info dump --output-directory=/tmp/cluster-dump || true
+          
+          echo "=== All Pods ==="
+          kubectl get pods -A || true
+          
+          echo "=== Events ==="
+          kubectl get events -A --sort-by='.lastTimestamp' || true
+          
+          echo "=== Operator CRDs ==="
+          kubectl get crd | grep nginx || true
+          
+          echo "=== NginxIngress Resources ==="
+          kubectl get nginxingresses.charts.nginx.org -A || true
+
+      - name: Cleanup
+        if: always()
+        run: |
+          # Clean up resources
+          kubectl delete -f examples/deployment-oss-min/nginx-ingress-controller.yaml --ignore-not-found=true
+          kubectl delete -f examples/ns.yaml --ignore-not-found=true
+          kubectl delete -f config/default --ignore-not-found=true || true
