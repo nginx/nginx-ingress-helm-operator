@@ -81,46 +81,37 @@ jobs:
 
       - name: Deploy Example NGINX Ingress Controller
         run: |
-          # Create the namespace and NGINX Ingress Controller instance using OSS minimal example
+          # Create the namespace and NGINX Ingress Controller instance in namespace nginx-ingress
+          kubectl create namespace nginx-ingress
           kubectl apply -f tests/nginx-ingress-controller-oss.yaml
-          
-          # Wait for the operator to process the NginxIngress resource and create the deployment
-          echo "Waiting for operator to create the deployment..."
-          for i in {1..30}; do
-            if kubectl get deployment my-nginx-ingress >/dev/null 2>&1; then
-              echo "Deployment found after $i attempts"
-              break
-            fi
-            echo "Attempt $i: Deployment not found yet, waiting..."
-            sleep 10
-          done
-          
+          sleep 10
+
           # Verify the deployment exists
-          kubectl get deployment my-nginx-ingress || exit 1
-          
+          kubectl get deployment my-nginx-ingress -n nginx-ingress
+
           # Wait for the NGINX Ingress Controller to be ready
-          kubectl wait --for=condition=Available --timeout=300s deployment/my-nginx-ingress 
+          kubectl wait --for=condition=Available --timeout=300s deployment/my-nginx-ingress -n nginx-ingress
       - name: Verify NGINX Ingress Controller Deployment
         run: |
           # Check all resources in the nginx ingress controller namespace
-          kubectl get all -n my-nginx-ingress
+          kubectl get all -n nginx-ingress
           
           # Check if the controller pod is running
-          kubectl get pods -n my-nginx-ingress -l app.kubernetes.io/name=nginx-ingress
+          kubectl get pods -n nginx-ingress 
           
           # Check the service
-          kubectl get services -n my-nginx-ingress
+          kubectl get services -n nginx-ingress
           
           # Check ingress class
           kubectl get ingressclass
           
-          # Verify controller is ready
-          kubectl wait --for=condition=Ready --timeout=60s pod -l app.kubernetes.io/name=nginx-ingress -n my-nginx-ingress
+          # Verify all pods are ready in nginx-ingress namespace
+          kubectl wait --for=condition=Ready --timeout=300s pod --all -n nginx-ingress
 
       - name: Verify NGINX Configuration
         run: |
           # Check NGINX configuration is valid
-          kubectl exec -n my-nginx-ingress deployment/my-nginx-ingress-controller -- nginx -t
+          kubectl exec deployment/my-nginx-ingress -- nginx -t
 
       - name: Check Operator and Controller Logs
         if: always()
@@ -129,7 +120,7 @@ jobs:
           kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system --tail=100 || true
           
           echo "=== NGINX Ingress Controller Logs ==="
-          kubectl logs -l app.kubernetes.io/name=nginx-ingress -n my-nginx-ingress --tail=100 || true
+          kubectl logs --all-containers -n nginx-ingress --tail=100 || true
 
       - name: Cleanup
         if: always()

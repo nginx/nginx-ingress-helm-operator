@@ -2,6 +2,7 @@ apiVersion: charts.nginx.org/v1alpha1
 kind: NginxIngress
 metadata:
   name: my-nginx-ingress
+  namespace: nginx-ingress
 spec:
   controller:
     defaultTLS:
