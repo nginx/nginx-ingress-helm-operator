@@ -21,13 +21,11 @@ metadata:
     features.operators.openshift.io/token-auth-azure: "false"
     features.operators.openshift.io/token-auth-gcp: "false"
     operatorframework.io/suggested-namespace: nginx-ingress
-    repository: https://github.com/nginxinc/nginx-ingress-helm-operator
+    repository: https://github.com/nginx/nginx-ingress-helm-operator
     support: NGINX Inc.
   labels:
     operatorframework.io/arch.amd64: supported
     operatorframework.io/arch.arm64: supported
-    operatorframework.io/arch.ppc64le: supported
-    operatorframework.io/arch.s390x: supported
   name: nginx-ingress-operator.v0.0.0
   namespace: placeholder
 spec:
@@ -283,7 +281,7 @@ spec:
   - openshift
   links:
   - name: Nginx Ingress Operator
-    url: https://github.com/nginxinc/nginx-ingress-helm-operator
+    url: https://github.com/nginx/nginx-ingress-helm-operator
   maintainers:
   - email: kubernetes@nginx.com
     name: NGINX Inc

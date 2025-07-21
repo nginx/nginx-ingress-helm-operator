@@ -6,7 +6,7 @@ plugins:
   scorecard.sdk.operatorframework.io/v2: {}
   sdk.x-openshift.io/v1: {}
 projectName: nginx-ingress-operator
-repo: github.com/nginxinc/nginx-ingress-helm-operator
+repo: github.com/nginx/nginx-ingress-helm-operator
 resources:
 - api:
     crdVersion: v1
