@@ -78,7 +78,7 @@ jobs:
 
       - name: Deploy NGINX Ingress Operator
         run: |
-          # Deploy the operator using make deploy with specified version, edge otherwise
+          # Deploy the operator using make deploy with specified version, edge other
           make deploy IMG=nginx/nginx-ingress-operator:${{ env.OPERATOR_VERSION }}
           
           # Wait for the operator to be ready
