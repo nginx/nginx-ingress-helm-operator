@@ -3,12 +3,6 @@ name: E2E Test
 on:
   schedule:
     - cron: '00 03 * * *'
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch: # Allow manual triggering
     inputs:
       operator_version:
@@ -74,7 +68,7 @@ jobs:
 
       - name: Deploy NGINX Ingress Operator
         run: |
-          # Deploy the operator using make deploy with specified version, edge other
+          # Deploy the operator using make deploy with specified version, edge otherwise
           make deploy IMG=nginx/nginx-ingress-operator:${{ env.OPERATOR_VERSION }}
           
           # Wait for the operator to be ready

@@ -16,7 +16,6 @@ permissions:
   contents: read
 
 jobs:
-
   create-pr:
     name: Certify for Red Hat OpenShift
     runs-on: ubuntu-22.04
