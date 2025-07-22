@@ -10,7 +10,22 @@ on:
     branches:
       - main
   workflow_dispatch: # Allow manual triggering
+    inputs:
+      operator_version:
+        description: 'Operator version/tag (e.g., edge, x.y.z)'
+        required: false
+        default: 'edge'
+        type: string
   workflow_call: # Allow being called by other workflows
+    inputs:
+      operator_version:
+        description: 'Operator version/tag (e.g., edge, x.y.z)'
+        required: false
+        default: 'edge'
+        type: string
+
+env:
+  OPERATOR_VERSION: ${{ inputs.operator_version || 'edge' }}
 
 concurrency:
   group: ${{ github.ref_name }}-e2e
@@ -63,8 +78,8 @@ jobs:
 
       - name: Deploy NGINX Ingress Operator
         run: |
-          # Deploy the operator using make deploy with edge image - strictly following manual installation docs
-          make deploy IMG=nginx/nginx-ingress-operator:edge
+          # Deploy the operator using make deploy with specified version, edge otherwise
+          make deploy IMG=nginx/nginx-ingress-operator:${{ env.OPERATOR_VERSION }}
           
           # Wait for the operator to be ready
           kubectl wait --for=condition=Available --timeout=300s deployment/nginx-ingress-operator-controller-manager -n nginx-ingress-operator-system
