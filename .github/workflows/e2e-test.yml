@@ -145,14 +145,14 @@ jobs:
         if: always()
         run: |
           echo "=== Operator Logs ==="
-          kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system --tail=100 || true
+          kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system
           
           echo "=== NGINX Ingress Controller Logs ==="
           # Get logs from all pods in nginx-ingress namespace
           for pod in $(kubectl get pods -n nginx-ingress -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || echo ""); do
             if [ -n "$pod" ]; then
               echo "--- Logs for pod: $pod ---"
-              kubectl logs $pod -n nginx-ingress --tail=50 || true
+              kubectl logs $pod -n nginx-ingress
             fi
           done
 
