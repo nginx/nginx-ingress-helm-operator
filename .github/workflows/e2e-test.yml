@@ -45,14 +45,10 @@ jobs:
       - name: Get Latest Versions
         run: |
           # Get latest Kubernetes version
-          LATEST_K8S=$(curl -s https://api.github.com/repos/kubernetes/kubernetes/releases/latest | jq -r '.tag_name')
-          echo "Latest Kubernetes version: $LATEST_K8S"
-          echo "KUBERNETES_VERSION=$LATEST_K8S" >> $GITHUB_ENV
+          echo "KUBERNETES_VERSION=$(curl -s https://api.github.com/repos/kubernetes/kubernetes/releases/latest | grep '"tag_name"' | cut -d'"' -f4)" >> $GITHUB_ENV
           
           # Get latest Minikube version
-          LATEST_MINIKUBE=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | jq -r '.tag_name')
-          echo "Latest Minikube version: $LATEST_MINIKUBE"
-          echo "MINIKUBE_VERSION=$LATEST_MINIKUBE" >> $GITHUB_ENV
+          echo "MINIKUBE_VERSION=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | grep '"tag_name"' | cut -d'"' -f4)" >> $GITHUB_ENV
 
       - name: Install kubectl
         run: |
