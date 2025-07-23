@@ -155,9 +155,3 @@ jobs:
               kubectl logs $pod -n nginx-ingress
             fi
           done
-
-      - name: Cleanup
-        if: always()
-        run: |
-          # Delete the Minikube cluster
-          minikube delete
