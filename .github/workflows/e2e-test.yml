@@ -1,0 +1,157 @@
+name: E2E Test
+
+on:
+  schedule:
+    - cron: '00 03 * * *'
+  workflow_dispatch: # Allow manual triggering
+    inputs:
+      operator_version:
+        description: 'Operator version/tag (e.g., edge, x.y.z)'
+        required: false
+        default: 'edge'
+        type: string
+  workflow_call: # Allow being called by other workflows
+    inputs:
+      operator_version:
+        description: 'Operator version/tag (e.g., edge, x.y.z)'
+        required: false
+        default: 'edge'
+        type: string
+
+env:
+  OPERATOR_VERSION: ${{ inputs.operator_version || 'edge' }}
+
+concurrency:
+  group: ${{ github.ref_name }}-e2e
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-test:
+    name: End-to-End Test
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Get Latest Versions
+        run: |
+          # Get latest Kubernetes version
+          echo "KUBERNETES_VERSION=$(curl -s https://api.github.com/repos/kubernetes/kubernetes/releases/latest | grep '"tag_name"' | cut -d'"' -f4)" >> $GITHUB_ENV
+          
+          # Get latest Minikube version
+          echo "MINIKUBE_VERSION=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | grep '"tag_name"' | cut -d'"' -f4)" >> $GITHUB_ENV
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/${{ env.KUBERNETES_VERSION }}/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: Install Minikube
+        run: |
+          curl -Lo minikube https://storage.googleapis.com/minikube/releases/${{ env.MINIKUBE_VERSION }}/minikube-linux-amd64
+          chmod +x minikube
+          sudo mv minikube /usr/local/bin/
+
+      - name: Start Minikube
+        run: |
+          minikube start --kubernetes-version=${{ env.KUBERNETES_VERSION }} --driver=docker --memory=4g --cpus=2
+
+      - name: Verify Kubernetes cluster
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+          kubectl get pods -A
+
+      - name: Deploy NGINX Ingress Operator
+        run: |
+          # Deploy the operator using make deploy with specified version, edge otherwise
+          make deploy IMG=nginx/nginx-ingress-operator:${{ env.OPERATOR_VERSION }}
+          
+          # Wait for the operator to be ready
+          kubectl wait --for=condition=Available --timeout=300s deployment/nginx-ingress-operator-controller-manager -n nginx-ingress-operator-system
+
+      - name: Verify Operator Deployment
+        run: |
+          # Check operator deployment status
+          kubectl get deployments -n nginx-ingress-operator-system
+          kubectl get pods -n nginx-ingress-operator-system
+          
+          # Check operator logs
+          kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system --tail=50
+
+      - name: Deploy Example NGINX Ingress Controller
+        run: |
+          # Create the namespace and NGINX Ingress Controller instance in namespace nginx-ingress
+          kubectl create namespace nginx-ingress
+          kubectl apply -f tests/nginx-ingress-controller-oss.yaml
+          
+          # Wait for the operator to process and install the Helm release
+          echo "Waiting for operator to install Helm release..."
+          sleep 30
+          
+          # Check what deployments were actually created
+          echo "Checking deployments in nginx-ingress namespace:"
+          kubectl get deployments -n nginx-ingress
+          
+          # Find the actual deployment name
+          DEPLOYMENT_NAME=$(kubectl get deployments -n nginx-ingress -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
+          
+          if [ -z "$DEPLOYMENT_NAME" ]; then
+            echo "No deployment found, waiting longer..."
+            sleep 30
+            kubectl get deployments -n nginx-ingress
+            DEPLOYMENT_NAME=$(kubectl get deployments -n nginx-ingress -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
+          fi
+          
+          if [ -n "$DEPLOYMENT_NAME" ]; then
+            echo "Found deployment: $DEPLOYMENT_NAME"
+            # Export for use in subsequent steps
+            echo "DEPLOYMENT_NAME=$DEPLOYMENT_NAME" >> $GITHUB_ENV
+            # Wait for the NGINX Ingress Controller to be ready
+            kubectl wait --for=condition=Available --timeout=300s deployment/$DEPLOYMENT_NAME -n nginx-ingress
+          else
+            echo "Failed to find any deployment in nginx-ingress namespace"
+            exit 1
+          fi
+      - name: Verify NGINX Ingress Controller Deployment
+        run: |
+          # Check all resources in the nginx ingress controller namespace
+          kubectl get all -n nginx-ingress
+          
+          # Check if the controller pod is running
+          kubectl get pods -n nginx-ingress 
+          
+          # Check the service
+          kubectl get services -n nginx-ingress
+          
+          # Check ingress class
+          kubectl get ingressclass
+          
+          # Verify all pods are ready in nginx-ingress namespace
+          kubectl wait --for=condition=Ready --timeout=300s pod --all -n nginx-ingress
+
+      - name: Verify NGINX Configuration
+        run: |
+          echo "Testing NGINX configuration for deployment: $DEPLOYMENT_NAME"
+          
+          # Check NGINX configuration is valid
+          kubectl exec -n nginx-ingress deployment/$DEPLOYMENT_NAME -- nginx -t
+
+      - name: Check Operator and Controller Logs
+        if: always()
+        run: |
+          echo "=== Operator Logs ==="
+          kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system
+          
+          echo "=== NGINX Ingress Controller Logs ==="
+          # Get logs from all pods in nginx-ingress namespace
+          for pod in $(kubectl get pods -n nginx-ingress -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || echo ""); do
+            if [ -n "$pod" ]; then
+              echo "--- Logs for pod: $pod ---"
+              kubectl logs $pod -n nginx-ingress
+            fi
+          done

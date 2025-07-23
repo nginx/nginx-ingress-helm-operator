@@ -151,10 +151,17 @@ jobs:
             - OpenShift {{openshift_version}} or newer.
         if: github.event_name != 'pull_request'
 
+  e2e-test:
+    name: Run E2E Tests # Deploy NGINX Ingress Operator and Nginx Ingress Controller
+    uses: ./.github/workflows/e2e-test.yml
+    needs: build
+    with:
+      operator_version: ${{ github.ref_type == 'tag' && needs.build.outputs.version || 'edge' }}
+
   certify:
     name: Certify for Red Hat OpenShift
     runs-on: ubuntu-22.04
-    needs: build
+    needs: [build, e2e-test]
     if: ${{ github.ref_type == 'tag' }}
     steps:
       - name: Checkout Repository
