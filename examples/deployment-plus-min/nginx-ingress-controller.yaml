@@ -11,10 +11,10 @@ spec:
     image:
       pullPolicy: IfNotPresent
       repository: nginx/nginx-ingress
-      tag: 5.1.1-ubi
+      tag: statefulset
     ingressClass:
       name: nginx
-    kind: deployment
+    kind: StatefulSet
     nginxplus: true
     mgmt:
       licenseTokenSecretName: "license-token"

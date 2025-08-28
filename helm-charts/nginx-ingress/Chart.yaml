@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 5.1.1
+appVersion: 5.2.0
 description: NGINX Ingress Controller
 home: https://github.com/nginx/kubernetes-ingress
 icon: https://raw.githubusercontent.com/nginx/kubernetes-ingress/v5.1.1/charts/nginx-ingress/chart-icon.png
@@ -14,4 +14,4 @@ name: nginx-ingress
 sources:
 - https://github.com/nginx/kubernetes-ingress/tree/v5.1.1/charts/nginx-ingress
 type: application
-version: 2.2.2
+version: 2.3.0

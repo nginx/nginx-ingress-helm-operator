@@ -1,8 +1,8 @@
 controller:
-  ## The name of the Ingress Controller daemonset or deployment.
+  ## The name of the Ingress Controller daemonset, deployment, or statefulset.
   name: controller
 
-  ## The kind of the Ingress Controller installation - deployment or daemonset.
+  ## The kind of the Ingress Controller installation - deployment, daemonset, or statefulset.
   kind: deployment
 
   ## The selectorLabels used to override the default values.
@@ -163,6 +163,16 @@ controller:
 
   ## Sets the log format of Ingress Controller. Options include: glog, json, text
   logFormat: glog
+
+  ## Cache configuration options
+  cache:
+    ## Enables shared cache across multiple pods using an external persistent volume
+    ## When enabled, the /var/cache/nginx directory will be mounted from a PVC instead of using emptyDir
+    ## User must create and configure a PVC with appropriate access mode
+    enableShared: false
+
+    ## The name of the PersistentVolumeClaim to use for shared cache, should match the name of the PVC created by the user
+    sharedPVCName: "nginx-shared-cache"
 
   ## A list of custom ports to expose on the NGINX Ingress Controller pod. Follows the conventional Kubernetes yaml syntax for container ports.
   customPorts: []
@@ -340,6 +350,40 @@ controller:
     ## Strategy used to replace old Pods by new ones. .spec.strategy.type can be "Recreate" or "RollingUpdate" for Deployments, and "OnDelete" or "RollingUpdate" for Daemonsets. "RollingUpdate" is the default value.
   strategy: {}
 
+  ## StatefulSet-specific configuration (only used when kind is "statefulset")
+  statefulset:
+    ## Pod management policy for StatefulSet. Can be "OrderedReady" or "Parallel".
+    ## OrderedReady will start pods one at a time in order, Parallel will start all pods at once.
+    podManagementPolicy: "OrderedReady"
+
+    ## PersistentVolumeClaim retention policy for StatefulSet
+    ## Determines when to delete PVCs when the StatefulSet is deleted or scaled down
+    persistentVolumeClaimRetentionPolicy:
+      ## When to delete PVCs when the StatefulSet is deleted. Can be "Retain" or "Delete".
+      whenDeleted: "Retain"
+      ## When to delete PVCs when the StatefulSet is scaled down. Can be "Retain" or "Delete".
+      whenScaled: "Retain"
+
+    ## Volume claim templates for StatefulSet persistent storage
+    ## Example configuration for NGINX cache and logs persistence:
+    volumeClaimTemplates: []
+    # - metadata:
+    #     name: nginx-cache
+    #   spec:
+    #     accessModes: [ "ReadWriteOnce" ]
+    #     storageClassName: "standard"
+    #     resources:
+    #       requests:
+    #         storage: 5Gi
+    # - metadata:
+    #     name: nginx-logs
+    #   spec:
+    #     accessModes: [ "ReadWriteOnce" ]
+    #     storageClassName: "standard"
+    #     resources:
+    #       requests:
+    #         storage: 1Gi
+
   ## Extra containers for the Ingress Controller pods.
   extraContainers: []
   # - name: container
@@ -502,6 +546,15 @@ controller:
     ## A list of custom ports to expose through the Ingress Controller service. Follows the conventional Kubernetes yaml syntax for service ports.
     customPorts: []
 
+    ## Session affinity configuration for the Ingress Controller service, ensures requests from the same client IP go to the same pod
+    sessionAffinity:
+      ## Enable session affinity. Valid values: None, ClientIP
+      enable: false
+      ## Session affinity type. Currently only ClientIP is supported.
+      type: ClientIP
+      ## Session affinity timeout in seconds (default: 3600 = 1 hour)
+      timeoutSeconds: 3600
+
   serviceAccount:
     ## The annotations of the service account of the Ingress Controller pods.
     annotations: {}
@@ -565,6 +618,32 @@ controller:
 
     ## The number of seconds after the Ingress Controller pod has started before readiness probes are initiated.
     initialDelaySeconds: 0
+
+  startupStatus:
+
+    ## Enable the startup probe.
+    enable: false
+
+    # ## Set the port where the startup endpoint is exposed. This is a required value if startupStatus.enable is true.
+    # port: 9999
+
+    # ## path to the startup endpoint. This is a required value if startupStatus.enable is true.
+    # path: /
+
+    # ## The number of seconds after the Ingress Controller pod has started before startup probes are initiated.
+    # initialDelaySeconds: 5
+
+    # ## The number of seconds between each startup probe.
+    # periodSeconds: 1
+
+    # ## The number of seconds after which the startup probe times out.
+    # timeoutSeconds: 1
+
+    # ## The number of seconds after which the startup probe is considered successful.
+    # successThreshold: 1
+
+    # ## The number of seconds after which the startup probe is considered failed.
+    # failureThreshold: 30
 
   ## Enable collection of latency metrics for upstreams. Requires prometheus.create.
   enableLatencyMetrics: false

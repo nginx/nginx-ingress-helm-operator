@@ -6,7 +6,7 @@ spec:
   # Default values copied from <project_dir>/deployments/helm-chart/values.yaml
   controller:
     name: controller
-    kind: deployment
+    kind: statefulset
     selectorLabels: {}
     annotations: {}
     nginxplus: false
@@ -38,7 +38,7 @@ spec:
     customPorts: []
     image:
       repository: nginx/nginx-ingress
-      tag: "5.1.1-ubi"
+      tag: "statefulset"
       # digest: "sha256:CHANGEME"
       pullPolicy: IfNotPresent
     lifecycle: {}
