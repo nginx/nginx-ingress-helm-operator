@@ -38,8 +38,8 @@ jobs:
 
       - name: Get Latest Versions
         run: |
-          # Get latest Kubernetes version
-          echo "KUBERNETES_VERSION=$(curl -s https://api.github.com/repos/kubernetes/kubernetes/releases/latest | grep '"tag_name"' | cut -d'"' -f4)" >> $GITHUB_ENV
+          # Pin Kubernetes version to version supported by Minikube
+          echo "KUBERNETES_VERSION=v1.33.1" >> $GITHUB_ENV
           
           # Get latest Minikube version
           echo "MINIKUBE_VERSION=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | grep '"tag_name"' | cut -d'"' -f4)" >> $GITHUB_ENV
