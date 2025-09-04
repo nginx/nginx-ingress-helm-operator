@@ -16,9 +16,21 @@ echo "Fetching OpenShift lifecycle data from Red Hat API..."
 
 # Fetch the API data and extract supported versions
 api_data=$(curl -s "$API_URL")
+curl_exit=$?
 
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to fetch data from Red Hat API"
+if [ $curl_exit -ne 0 ]; then
+    echo "Error: Failed to fetch data from Red Hat API (exit code: $curl_exit)"
+    exit 1
+fi
+
+# Validate API response structure
+if ! echo "$api_data" | jq -e '.data' > /dev/null 2>&1; then
+    echo "Error: Invalid API response - missing 'data' field"
+    exit 1
+fi
+
+if [ "$(echo "$api_data" | jq '.data | length')" -eq 0 ]; then
+    echo "Error: API response contains empty data array"
     exit 1
 fi
 
@@ -50,7 +62,7 @@ if [ -f "$dockerfile_path" ]; then
     
     # Use sed to replace the OpenShift version label
     if grep -q "com.redhat.openshift.versions=" "$dockerfile_path"; then
-        sed -i.bak "s/LABEL com.redhat.openshift.versions=\"v[0-9.]*\"/LABEL com.redhat.openshift.versions=\"v$min_version\"/" "$dockerfile_path"
+        sed -i.bak "s/LABEL com.redhat.openshift.versions=\"v[0-9]\+\.[0-9]\+\"/LABEL com.redhat.openshift.versions=\"v$min_version\"/" "$dockerfile_path"
         echo "Updated bundle.Dockerfile"
         rm "$dockerfile_path.bak"
     else
@@ -67,7 +79,7 @@ if [ -f "$annotations_path" ]; then
     
     # Use sed to replace the OpenShift version annotation
     if grep -q "com.redhat.openshift.versions:" "$annotations_path"; then
-        sed -i.bak "s/com.redhat.openshift.versions: v[0-9.]*/com.redhat.openshift.versions: v$min_version/" "$annotations_path"
+        sed -i.bak "s/com.redhat.openshift.versions: v[0-9]\+\.[0-9]\+/com.redhat.openshift.versions: v$min_version/" "$annotations_path"
         echo "Updated annotations.yaml"
         rm "$annotations_path.bak"
     else
@@ -84,7 +96,7 @@ if [ -f "$makefile_path" ]; then
     
     # Use sed to replace the OPENSHIFT_VERSION variable
     if grep -q "OPENSHIFT_VERSION ?=" "$makefile_path"; then
-        sed -i.bak "s/OPENSHIFT_VERSION ?= v[0-9.]*/OPENSHIFT_VERSION ?= v$min_version/" "$makefile_path"
+        sed -i.bak "s/OPENSHIFT_VERSION ?= v[0-9]\+\.[0-9]\+/OPENSHIFT_VERSION ?= v$min_version/" "$makefile_path"
         echo "Updated Makefile"
         rm "$makefile_path.bak"
     else
