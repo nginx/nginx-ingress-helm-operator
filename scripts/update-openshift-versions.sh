@@ -1,0 +1,100 @@
+#!/bin/bash
+
+# Script to automatically update OpenShift version annotations based on Red Hat API
+# This script finds the minimum supported OpenShift version (Full Support or Maintenance Support)
+# and updates both bundle.Dockerfile and bundle/metadata/annotations.yaml
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Red Hat API endpoint for OpenShift lifecycle
+API_URL="https://access.redhat.com/product-life-cycles/api/v1/products?name=Openshift%20Container%20Platform%204"
+
+echo "Fetching OpenShift lifecycle data from Red Hat API..."
+
+# Fetch the API data and extract supported versions
+api_data=$(curl -s "$API_URL")
+
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to fetch data from Red Hat API"
+    exit 1
+fi
+
+# Extract versions that are in "Full Support" or "Maintenance Support" 
+# (excluding "Extended Support" and "End of life")
+supported_versions=$(echo "$api_data" | jq -r '
+    .data[0].versions[] | 
+    select(.type == "Full Support" or .type == "Maintenance Support") |
+    .name
+' | sort -V)
+
+if [ -z "$supported_versions" ]; then
+    echo "Error: No supported versions found"
+    exit 1
+fi
+
+# Get the minimum supported version
+min_version=$(echo "$supported_versions" | head -n 1)
+
+echo "Currently supported OpenShift versions:"
+echo "$supported_versions" | sed 's/^/  - /'
+echo ""
+echo "Minimum supported version: $min_version"
+
+# Update bundle.Dockerfile
+dockerfile_path="$PROJECT_ROOT/bundle.Dockerfile"
+if [ -f "$dockerfile_path" ]; then
+    echo "Updating $dockerfile_path..."
+    
+    # Use sed to replace the OpenShift version label
+    if grep -q "com.redhat.openshift.versions=" "$dockerfile_path"; then
+        sed -i.bak "s/LABEL com.redhat.openshift.versions=\"v[0-9.]*\"/LABEL com.redhat.openshift.versions=\"v$min_version\"/" "$dockerfile_path"
+        echo "Updated bundle.Dockerfile"
+        rm "$dockerfile_path.bak"
+    else
+        echo "OpenShift version label not found in bundle.Dockerfile"
+    fi
+else
+    echo "bundle.Dockerfile not found"
+fi
+
+# Update bundle/metadata/annotations.yaml
+annotations_path="$PROJECT_ROOT/bundle/metadata/annotations.yaml"
+if [ -f "$annotations_path" ]; then
+    echo "Updating $annotations_path..."
+    
+    # Use sed to replace the OpenShift version annotation
+    if grep -q "com.redhat.openshift.versions:" "$annotations_path"; then
+        sed -i.bak "s/com.redhat.openshift.versions: v[0-9.]*/com.redhat.openshift.versions: v$min_version/" "$annotations_path"
+        echo "Updated annotations.yaml"
+        rm "$annotations_path.bak"
+    else
+        echo "OpenShift version annotation not found in annotations.yaml"
+    fi
+else
+    echo "bundle/metadata/annotations.yaml not found"
+fi
+
+# Update Makefile OPENSHIFT_VERSION variable
+makefile_path="$PROJECT_ROOT/Makefile"
+if [ -f "$makefile_path" ]; then
+    echo "Updating $makefile_path..."
+    
+    # Use sed to replace the OPENSHIFT_VERSION variable
+    if grep -q "OPENSHIFT_VERSION ?=" "$makefile_path"; then
+        sed -i.bak "s/OPENSHIFT_VERSION ?= v[0-9.]*/OPENSHIFT_VERSION ?= v$min_version/" "$makefile_path"
+        echo "Updated Makefile"
+        rm "$makefile_path.bak"
+    else
+        echo "OPENSHIFT_VERSION variable not found in Makefile"
+    fi
+else
+    echo "Makefile not found"
+fi
+
+echo ""
+echo "OpenShift version updated to v$min_version"
+echo ""
+echo "Note: This version (v$min_version) will automatically support all newer OpenShift versions according to Red Hat's operator bundle specification."
