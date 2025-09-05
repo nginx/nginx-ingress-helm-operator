@@ -20,6 +20,6 @@ COPY bundle/manifests /manifests/
 COPY bundle/metadata /metadata/
 COPY bundle/tests/scorecard /tests/scorecard/
 
-LABEL com.redhat.openshift.versions="v4.12"
+LABEL com.redhat.openshift.versions="v4.16"
 LABEL com.redhat.delivery.operator.bundle=true
 LABEL com.redhat.delivery.backport=true

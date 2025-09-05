@@ -25,6 +25,10 @@ BUNDLE_DEFAULT_CHANNEL := --default-channel=$(DEFAULT_CHANNEL)
 endif
 BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 
+# OPENSHIFT_VERSION defines the minimum supported OpenShift version for the bundle.
+# This can be updated automatically using: make update-openshift-versions
+OPENSHIFT_VERSION ?= v4.16
+
 # IMAGE_TAG_BASE defines the docker.io namespace and part of the image name for remote images.
 # This variable is used to construct full image tags for bundle and catalog images.
 #
@@ -197,8 +201,8 @@ bundle: kustomize operator-sdk ## Generate bundle manifests and metadata, then v
 	cd config/default && $(KUSTOMIZE) edit set image kube-rbac-proxy=$(KRP_IMAGE_BASE):$(KRP_IMAGE_TAG)
 	if [ -n "$(IMAGE_PULL_SECRET_NAME)" ]; then cd config/default && $(KUSTOMIZE) edit add patch --kind Deployment --group apps --version v1 --name controller-manager --patch '${image_pull_secrets_patch}'; fi
 	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS)
-	@printf "%s\n" '' 'LABEL com.redhat.openshift.versions="v4.12"' 'LABEL com.redhat.delivery.operator.bundle=true' 'LABEL com.redhat.delivery.backport=true' >> bundle.Dockerfile
-	@printf "%s\n" '' '  # OpenShift annotations.' '  com.redhat.openshift.versions: v4.12' >> bundle/metadata/annotations.yaml
+	@printf "%s\n" '' 'LABEL com.redhat.openshift.versions="$(OPENSHIFT_VERSION)"' 'LABEL com.redhat.delivery.operator.bundle=true' 'LABEL com.redhat.delivery.backport=true' >> bundle.Dockerfile
+	@printf "%s\n" '' '  # OpenShift annotations.' '  com.redhat.openshift.versions: $(OPENSHIFT_VERSION)' >> bundle/metadata/annotations.yaml
 	$(OPERATOR_SDK) bundle validate ./bundle
 
 .PHONY: bundle-build
@@ -248,4 +252,9 @@ catalog-build: opm ## Build a catalog image.
 .PHONY: catalog-push
 catalog-push: ## Push a catalog image.
 	$(MAKE) docker-push IMG=$(CATALOG_IMG)
+
+.PHONY: update-openshift-versions
+update-openshift-versions: ## Update OpenShift supported versions based on Red Hat lifecycle API
+	@echo "Updating OpenShift supported versions..."
+	@./scripts/update-openshift-versions.sh
 
