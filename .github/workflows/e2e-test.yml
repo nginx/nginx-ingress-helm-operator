@@ -39,10 +39,19 @@ jobs:
       - name: Get Latest Versions
         run: |
           # Get latest supported Kubernetes version from Minikube
-          echo "KUBERNETES_VERSION=v$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | jq -r '.body' | grep -o "Support Kubernetes version v[0-9]\+\.[0-9]\+\.[0-9]\+" | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+")" >> $GITHUB_ENV
+          # Handle both old format "Support Kubernetes version vX.Y.Z" and new format "Support for Kubernetes vX.Y.Z"
+          K8S_VERSION=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | jq -r '.body' | grep -oE "(Support for Kubernetes|Support Kubernetes version) v[0-9]+\.[0-9]+\.[0-9]+" | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -1)
+          
+          # Fallback to a known stable Kubernetes version if extraction fails
+          if [ -z "$K8S_VERSION" ]; then
+            echo "Warning: Could not extract Kubernetes version from Minikube release notes, using fallback version 1.34.0"
+            K8S_VERSION="1.34.0"
+          fi
+          
+          echo "KUBERNETES_VERSION=v$K8S_VERSION" >> $GITHUB_ENV
           
           # Get latest Minikube version
-          echo "MINIKUBE_VERSION=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | grep '"tag_name"' | cut -d'"' -f4)" >> $GITHUB_ENV
+          echo "MINIKUBE_VERSION=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | jq -r '.tag_name')" >> $GITHUB_ENV
 
       - name: Install kubectl
         run: |
