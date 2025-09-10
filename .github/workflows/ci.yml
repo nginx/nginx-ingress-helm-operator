@@ -170,7 +170,7 @@ jobs:
       - name: Certify Images
         continue-on-error: false
         run: |
-          curl -fsSL https://github.com/redhat-openshift-ecosystem/openshift-preflight/releases/download/1.13.3/preflight-linux-amd64 --output preflight
+          curl -fsSL https://github.com/redhat-openshift-ecosystem/openshift-preflight/releases/download/1.14.1/preflight-linux-amd64 --output preflight
           chmod +x preflight
 
           IFS=',' read -ra arch_list <<< "${{ env.platforms }}"
