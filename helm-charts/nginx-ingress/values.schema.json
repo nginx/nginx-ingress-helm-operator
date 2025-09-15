@@ -35,11 +35,13 @@
           "title": "The kind of the Ingress Controller",
           "enum": [
             "deployment",
-            "daemonset"
+            "daemonset",
+            "statefulset"
           ],
           "examples": [
             "deployment",
-            "daemonset"
+            "daemonset",
+            "statefulset"
           ]
         },
         "selectorLabels": {
@@ -657,6 +659,15 @@
             "json"
           ]
         },
+        "directiveAutoAdjust": {
+          "type": "boolean",
+          "default": false,
+          "title": "Enables automatic adjustment of the NGINX buffers directives",
+          "examples": [
+            false,
+            true
+          ]
+        },
         "customPorts": {
           "type": "array",
           "default": [],
@@ -698,10 +709,10 @@
             },
             "tag": {
               "type": "string",
-              "default": "5.1.1",
+              "default": "5.2.0",
               "title": "The tag of the Ingress Controller image",
               "examples": [
-                "5.1.1"
+                "5.2.0"
               ]
             },
             "digest": {
@@ -738,7 +749,7 @@
           "examples": [
             {
               "repository": "nginx/nginx-ingress",
-              "tag": "5.1.1",
+              "tag": "5.2.0",
               "pullPolicy": "IfNotPresent"
             }
           ]
@@ -985,6 +996,55 @@
             }
           ]
         },
+        "statefulset": {
+          "type": "object",
+          "default": {},
+          "title": "The StatefulSet configuration Schema",
+          "properties": {
+            "podManagementPolicy": {
+              "type": "string",
+              "default": "OrderedReady",
+              "title": "The pod management policy",
+              "enum": [
+                "OrderedReady",
+                "Parallel"
+              ]
+            },
+            "persistentVolumeClaimRetentionPolicy": {
+              "type": "object",
+              "default": {},
+              "title": "The persistentVolumeClaimRetentionPolicy Schema",
+              "$ref": "file://./helm-charts/nginx-ingress/v1.33.1/_definitions.json#/definitions/io.k8s.api.apps.v1.StatefulSetPersistentVolumeClaimRetentionPolicy"
+            },
+            "nginxCachePVC": {
+              "type": "object",
+              "default": {},
+              "title": "The nginxCachePVC Schema",
+              "properties": {
+                "size": {
+                  "type": "string",
+                  "default": "256Mi",
+                  "title": "The size Schema",
+                  "$ref": "file://./helm-charts/nginx-ingress/v1.33.1/_definitions.json#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+                },
+                "storageClass": {
+                  "type": "string",
+                  "title": "The storageClass Schema",
+                  "default": "",
+                  "$ref": "file://./helm-charts/nginx-ingress/v1.33.1/_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimSpec/properties/storageClassName"
+                },
+                "accessModes": {
+                  "type": "array",
+                  "default": [
+                    "ReadWriteOnce"
+                  ],
+                  "title": "The accessModes Schema",
+                  "$ref": "file://./helm-charts/nginx-ingress/v1.33.1/_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimSpec/properties/accessModes"
+                }
+              }
+            }
+          }
+        },
         "extraContainers": {
           "type": "array",
           "default": [],
@@ -1113,6 +1173,14 @@
               "title": "The create Schema",
               "examples": [
                 false
+              ]
+            },
+            "customName": {
+              "type": "string",
+              "default": "",
+              "title": "The customName Schema",
+              "examples": [
+                "the-namespace/the-name-of-the-global-configuration-custom-resource"
               ]
             },
             "spec": {
@@ -1455,6 +1523,50 @@
                 "type": "object",
                 "ref": "file://./helm-charts/nginx-ingress/v1.33.1/_definitions.json#/definitions/io.k8s.api.core.v1.ServicePort"
               }
+            },
+            "sessionAffinity": {
+              "type": "object",
+              "default": {},
+              "title": "The sessionAffinity Schema",
+              "required": [],
+              "properties": {
+                "enable": {
+                  "type": "boolean",
+                  "default": false,
+                  "title": "Enable session affinity",
+                  "examples": [
+                    false
+                  ]
+                },
+                "type": {
+                  "type": "string",
+                  "default": "ClientIP",
+                  "title": "Session affinity type",
+                  "enum": [
+                    "ClientIP"
+                  ],
+                  "examples": [
+                    "ClientIP"
+                  ]
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "default": 3600,
+                  "title": "Session affinity timeout in seconds",
+                  "minimum": 1,
+                  "maximum": 86400,
+                  "examples": [
+                    3600
+                  ]
+                }
+              },
+              "examples": [
+                {
+                  "enable": false,
+                  "type": "ClientIP",
+                  "timeoutSeconds": 3600
+                }
+              ]
             }
           },
           "examples": [
@@ -1483,7 +1595,12 @@
                 "targetPort": 443,
                 "name": "https"
               },
-              "customPorts": []
+              "customPorts": [],
+              "sessionAffinity": {
+                "enable": false,
+                "type": "ClientIP",
+                "timeoutSeconds": 3600
+              }
             }
           ]
         },
@@ -1759,6 +1876,98 @@
             }
           ]
         },
+        "startupStatus": {
+          "type": "object",
+          "default": {},
+          "title": "The startupStatus",
+          "required": [],
+          "properties": {
+            "enable": {
+              "type": "boolean",
+              "default": false,
+              "title": "Enable the startup probe",
+              "examples": [
+                true
+              ]
+            },
+            "port": {
+              "type": "integer",
+              "default": 0,
+              "title": "The port for the startup probe",
+              "examples": [
+                9999
+              ]
+            },
+            "path": {
+              "type": "string",
+              "default": "",
+              "title": "The path for the startup probe",
+              "examples": [
+                "/"
+              ]
+            },
+            "initialDelaySeconds": {
+              "type": "integer",
+              "default": 0,
+              "title": "Initial delay seconds for the startup probe",
+              "$ref": "file://./helm-charts/nginx-ingress/v1.33.1/_definitions.json#/definitions/io.k8s.api.core.v1.Probe/properties/initialDelaySeconds"
+            },
+            "periodSeconds": {
+              "type": "integer",
+              "default": 0,
+              "title": "Period seconds for the startup probe",
+              "$ref": "file://./helm-charts/nginx-ingress/v1.33.1/_definitions.json#/definitions/io.k8s.api.core.v1.Probe/properties/periodSeconds"
+            },
+            "timeoutSeconds": {
+              "type": "integer",
+              "default": 0,
+              "title": "Timeout seconds for the startup probe",
+              "$ref": "file://./helm-charts/nginx-ingress/v1.33.1/_definitions.json#/definitions/io.k8s.api.core.v1.Probe/properties/timeoutSeconds"
+            },
+            "successThreshold": {
+              "type": "integer",
+              "default": 0,
+              "title": "Success threshold for the startup probe",
+              "$ref": "file://./helm-charts/nginx-ingress/v1.33.1/_definitions.json#/definitions/io.k8s.api.core.v1.Probe/properties/successThreshold"
+            },
+            "failureThreshold": {
+              "type": "integer",
+              "default": 0,
+              "title": "Failure threshold for the startup probe",
+              "$ref": "file://./helm-charts/nginx-ingress/v1.33.1/_definitions.json#/definitions/io.k8s.api.core.v1.Probe/properties/failureThreshold"
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "enable": {
+                    "const": true
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "enable",
+                  "port",
+                  "path"
+                ]
+              }
+            }
+          ],
+          "examples": [
+            {
+              "enable": true,
+              "port": 9999,
+              "path": "/",
+              "initialDelaySeconds": 5,
+              "periodSeconds": 1,
+              "timeoutSeconds": 1,
+              "successThreshold": 1,
+              "failureThreshold": 30
+            }
+          ]
+        },
         "enableLatencyMetrics": {
           "type": "boolean",
           "default": false,
@@ -1909,7 +2118,7 @@
           "customPorts": [],
           "image": {
             "repository": "nginx/nginx-ingress",
-            "tag": "5.1.1",
+            "tag": "5.2.0",
             "digest": "",
             "pullPolicy": "IfNotPresent"
           },
@@ -2552,7 +2761,7 @@
         "customPorts": [],
         "image": {
           "repository": "nginx/nginx-ingress",
-          "tag": "5.1.1",
+          "tag": "5.2.0",
           "digest": "",
           "pullPolicy": "IfNotPresent"
         },
