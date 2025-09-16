@@ -1,4 +1,4 @@
-name: release-operator
+name: Release Operator
 
 run-name: ${{ inputs.dry_run && '[DRY RUN] ' || '' }}Release Operator ${{ inputs.operator_version }} by @${{ github.actor }}
 
