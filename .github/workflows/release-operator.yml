@@ -25,7 +25,6 @@ jobs:
   variables:
     name: Set Variables
     runs-on: ubuntu-24.04-amd64
-    if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
     outputs:
@@ -235,8 +234,8 @@ jobs:
           major-label: "change"
           publish: ${{ ! inputs.dry_run }}
           variables: |
-            nic_version=${{ needs.build.outputs.chart_version }}
-            openshift_version=${{ needs.build.outputs.openshift_version }}
+            nic_version=${{ needs.variables.outputs.chart_version }}
+            openshift_version=${{ needs.variables.outputs.openshift_version }}
           notes-footer: |
             ## Compatibility
 
