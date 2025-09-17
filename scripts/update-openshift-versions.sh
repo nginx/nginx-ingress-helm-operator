@@ -15,7 +15,7 @@ API_URL="https://access.redhat.com/product-life-cycles/api/v1/products?name=Open
 echo "Fetching OpenShift lifecycle data from Red Hat API..."
 
 # Fetch the API data and extract supported versions
-api_data=$(curl -s "$API_URL")
+api_data=$(curl -sSf "$API_URL")
 curl_exit=$?
 
 if [ $curl_exit -ne 0 ]; then
