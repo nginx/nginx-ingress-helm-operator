@@ -64,7 +64,7 @@ if [ -f "$dockerfile_path" ]; then
     # Use sed to replace the OpenShift version label
     if grep -q "com.redhat.openshift.versions=" "$dockerfile_path"; then
         temp_file=$(mktemp)
-        sed "s/LABEL com.redhat.openshift.versions=\"v[0-9][0-9]*\.[0-9][0-9]*\"/LABEL com.redhat.openshift.versions=\"v$min_version\"/" "$dockerfile_path" > "$temp_file"
+        sed "s/LABEL com.redhat.openshift.versions=\"v[0-9]\+\.[0-9]\+\"/LABEL com.redhat.openshift.versions=\"v$min_version\"/" "$dockerfile_path" > "$temp_file"
         mv "$temp_file" "$dockerfile_path"
         echo "Updated bundle.Dockerfile"
     else
@@ -82,7 +82,7 @@ if [ -f "$annotations_path" ]; then
     # Use sed to replace the OpenShift version annotation
     if grep -q "com.redhat.openshift.versions:" "$annotations_path"; then
         temp_file=$(mktemp)
-        sed "s/com.redhat.openshift.versions: v[0-9][0-9]*\.[0-9][0-9]*/com.redhat.openshift.versions: v$min_version/" "$annotations_path" > "$temp_file"
+        sed "s/com.redhat.openshift.versions: v[0-9]\+\.[0-9]\+/com.redhat.openshift.versions: v$min_version/" "$annotations_path" > "$temp_file"
         mv "$temp_file" "$annotations_path"
         echo "Updated annotations.yaml"
     else
@@ -100,7 +100,7 @@ if [ -f "$makefile_path" ]; then
     # Use sed to replace the OPENSHIFT_VERSION variable
     if grep -q "OPENSHIFT_VERSION ?=" "$makefile_path"; then
         temp_file=$(mktemp)
-        sed "s/OPENSHIFT_VERSION ?= v[0-9][0-9]*\.[0-9][0-9]*/OPENSHIFT_VERSION ?= v$min_version/" "$makefile_path" > "$temp_file"
+        sed "s/OPENSHIFT_VERSION ?= v[0-9]\+\.[0-9]\+/OPENSHIFT_VERSION ?= v$min_version/" "$makefile_path" > "$temp_file"
         mv "$temp_file" "$makefile_path"
         echo "Updated Makefile"
     else
