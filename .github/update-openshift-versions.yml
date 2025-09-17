@@ -1,0 +1,44 @@
+name: Update OpenShift Versions
+
+on:
+  schedule:
+    # Run weekly on Mondays at 09:00 UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-openshift-versions:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Update OpenShift versions
+        run: ./scripts/update-openshift-versions.sh
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'update OpenShift supported versions'
+          title: 'Update OpenShift supported versions'
+          body: |
+            This PR updates the minimum supported OpenShift version based on the latest Red Hat lifecycle data.
+            
+            Updated files:
+            - `bundle.Dockerfile`
+            - `bundle/metadata/annotations.yaml`
+            - `Makefile`
+            
+          branch: chore/update-openshift-versions
+          delete-branch: true
