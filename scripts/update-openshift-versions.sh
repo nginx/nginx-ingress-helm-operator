@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to automatically update OpenShift version annotations based on Red Hat API
-# This script finds the minimum supported OpenShift version (Full Support or Maintenance Support)
+# This script finds the minimum OpenShift version with Extended Update Support Add-On available
 # and updates both bundle.Dockerfile and bundle/metadata/annotations.yaml
 
 set -e
@@ -34,11 +34,11 @@ if [ "$(echo "$api_data" | jq '.data | length')" -eq 0 ]; then
     exit 1
 fi
 
-# Extract versions that are in "Full Support" or "Maintenance Support" 
-# (excluding "Extended Support" and "End of life")
+# Extract versions that have Extended Update Support Add-On available
+# (versions with "Extended update support" phase that is not "N/A")
 supported_versions=$(echo "$api_data" | jq -r '
     .data[0].versions[] | 
-    select(.type == "Full Support" or .type == "Maintenance Support") |
+    select(.phases[] | select(.name == "Extended update support" and .date != "N/A")) |
     .name
 ' | sort -V)
 
@@ -62,9 +62,10 @@ if [ -f "$dockerfile_path" ]; then
     
     # Use sed to replace the OpenShift version label
     if grep -q "com.redhat.openshift.versions=" "$dockerfile_path"; then
-        sed -i.bak "s/LABEL com.redhat.openshift.versions=\"v[0-9]\+\.[0-9]\+\"/LABEL com.redhat.openshift.versions=\"v$min_version\"/" "$dockerfile_path"
+        temp_file=$(mktemp)
+        sed "s/LABEL com.redhat.openshift.versions=\"v[0-9][0-9]*\.[0-9][0-9]*\"/LABEL com.redhat.openshift.versions=\"v$min_version\"/" "$dockerfile_path" > "$temp_file"
+        mv "$temp_file" "$dockerfile_path"
         echo "Updated bundle.Dockerfile"
-        rm "$dockerfile_path.bak"
     else
         echo "OpenShift version label not found in bundle.Dockerfile"
     fi
@@ -79,9 +80,10 @@ if [ -f "$annotations_path" ]; then
     
     # Use sed to replace the OpenShift version annotation
     if grep -q "com.redhat.openshift.versions:" "$annotations_path"; then
-        sed -i.bak "s/com.redhat.openshift.versions: v[0-9]\+\.[0-9]\+/com.redhat.openshift.versions: v$min_version/" "$annotations_path"
+        temp_file=$(mktemp)
+        sed "s/com.redhat.openshift.versions: v[0-9][0-9]*\.[0-9][0-9]*/com.redhat.openshift.versions: v$min_version/" "$annotations_path" > "$temp_file"
+        mv "$temp_file" "$annotations_path"
         echo "Updated annotations.yaml"
-        rm "$annotations_path.bak"
     else
         echo "OpenShift version annotation not found in annotations.yaml"
     fi
@@ -96,9 +98,10 @@ if [ -f "$makefile_path" ]; then
     
     # Use sed to replace the OPENSHIFT_VERSION variable
     if grep -q "OPENSHIFT_VERSION ?=" "$makefile_path"; then
-        sed -i.bak "s/OPENSHIFT_VERSION ?= v[0-9]\+\.[0-9]\+/OPENSHIFT_VERSION ?= v$min_version/" "$makefile_path"
+        temp_file=$(mktemp)
+        sed "s/OPENSHIFT_VERSION ?= v[0-9][0-9]*\.[0-9][0-9]*/OPENSHIFT_VERSION ?= v$min_version/" "$makefile_path" > "$temp_file"
+        mv "$temp_file" "$makefile_path"
         echo "Updated Makefile"
-        rm "$makefile_path.bak"
     else
         echo "OPENSHIFT_VERSION variable not found in Makefile"
     fi

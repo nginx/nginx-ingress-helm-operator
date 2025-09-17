@@ -27,7 +27,7 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 
 # OPENSHIFT_VERSION defines the minimum supported OpenShift version for the bundle.
 # This can be updated automatically using: make update-openshift-versions
-OPENSHIFT_VERSION ?= v4.16
+OPENSHIFT_VERSION ?= v4.12
 
 # IMAGE_TAG_BASE defines the docker.io namespace and part of the image name for remote images.
 # This variable is used to construct full image tags for bundle and catalog images.
