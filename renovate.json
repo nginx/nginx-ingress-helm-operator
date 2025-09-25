@@ -4,6 +4,35 @@
     "github>nginx/k8s-common",
     "schedule:daily"
   ],
+  "labels": [
+    "dependencies"
+  ],
+  "packageRules": [
+    {
+      "addLabels": [
+        "docker"
+      ],
+      "matchDatasources": [
+        "docker"
+      ]
+    },
+    {
+      "addLabels": [
+        "helm"
+      ],
+      "matchDatasources": [
+        "helm"
+      ]
+    },
+    {
+      "addLabels": [
+        "github_actions"
+      ],
+      "matchManagers": [
+        "action"
+      ]
+    }
+  ],
   "kubernetes": {
     "managerFilePatterns": [
       "/bundle/manifests/.+\\.yaml$/",
