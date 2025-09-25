@@ -18,8 +18,8 @@
     {
       "customType": "regex",
       "description": "Update env variable version in Github Actions workflow",
-      "fileMatch": [
-        "/.github/workflows/.+\\.ya?ml$/"
+      "managerFilePatterns": [
+        "//.github/workflows/.+\\.ya?ml$//"
       ],
       "matchStrings": [
         "\\s+.+?: (?<currentValue>.+?) # renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s"
@@ -28,8 +28,8 @@
     {
       "customType": "regex",
       "description": "Update Operator SDK version in bundle Dockerfile",
-      "fileMatch": [
-        "bundle\\.Dockerfile$"
+      "managerFilePatterns": [
+        "/bundle\\.Dockerfile$/"
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\sLABEL operators.operatorframework.io.metrics.builder=operator-sdk-(?<currentValue>.+?)\\s"
