@@ -23,7 +23,7 @@ permissions:
 jobs:
   build:
     name: Build Image
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.meta.outputs.version }}
     permissions:
@@ -160,7 +160,7 @@ jobs:
 
   certify:
     name: Certify for Red Hat OpenShift
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [build, e2e-test]
     if: ${{ github.ref_type == 'tag' }}
     env:
