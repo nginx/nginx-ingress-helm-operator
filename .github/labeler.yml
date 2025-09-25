@@ -19,4 +19,4 @@ documentation:
     - any-glob-to-any-file: '**/*.md'
 
 dependencies:
-  - head-branch: ['^deps/', '^dep/', '^dependabot/']
+  - head-branch: ['^deps/', '^dep/', '^dependabot/', '^renovate/']
