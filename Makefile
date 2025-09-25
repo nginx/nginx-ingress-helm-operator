@@ -53,7 +53,16 @@ endif
 
 # Set the Operator SDK version to use. By default, what is installed on the system is used.
 # This is useful for CI or a project to utilize a specific version of the operator-sdk toolkit.
+# renovate: datasource=github-releaser depName=operator-sdk packageName=operator-framework/operator-sdk
 OPERATOR_SDK_VERSION ?= v1.40.0
+
+# renovate: datasource=github-releaser depName=operator-registry packageName=operator-framework/operator-registry
+OPM_VERSION ?= v1.28.0
+
+# Set the Kustomize version to use. By default, what is installed on the system is used.
+# This is useful for CI or a project to utilize a specific version of the kustomize toolkit.
+# renovate: datasource=github-releaser depName=kustomize packageName=kubernetes-sigs/kustomize
+KUSTOMIZE_VERSION ?= v5.0.1
 
 # Image URL to use all building/pushing image targets
 IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
@@ -62,7 +71,8 @@ IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
 KRP_IMAGE_BASE ?= quay.io/brancz/kube-rbac-proxy
 
 # kube-rbac-proxy image tag
-KRP_IMAGE_TAG ?= v0.18.0
+# renovate: datasource=docker depName=depName=quay.io/brancz/kube-rbac-proxy
+KRP_IMAGE_VERSION ?= v0.18.0
 
 # image pull secret name: eg regcred
 IMAGE_PULL_SECRET_NAME ?=
@@ -134,7 +144,7 @@ uninstall: kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube
 .PHONY: deploy
 deploy: kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
-	cd config/default && $(KUSTOMIZE) edit set image kube-rbac-proxy=$(KRP_IMAGE_BASE):$(KRP_IMAGE_TAG)
+	cd config/default && $(KUSTOMIZE) edit set image kube-rbac-proxy=$(KRP_IMAGE_BASE):$(KRP_IMAGE_VERSION)
 	if [ -n "$(IMAGE_PULL_SECRET_NAME)" ]; then cd config/default && $(KUSTOMIZE) edit add patch --kind Deployment --group apps --version v1 --name controller-manager --patch '${image_pull_secrets_patch}'; fi
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
 
@@ -153,7 +163,7 @@ ifeq (,$(shell which kustomize 2>/dev/null))
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(KUSTOMIZE)) ;\
-	curl -sSLo - https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.0.1/kustomize_v5.0.1_$(OS)_$(ARCH).tar.gz | \
+	curl -sSLo - https://github.com/kubernetes-sigs/kustomize/releases/download/$(KUSTOMIZE_VERSION)/kustomize_$(KUSTOMIZE_VERSION)_$(OS)_$(ARCH).tar.gz | \
 	tar xzf - -C bin/ ;\
 	}
 else
@@ -198,7 +208,7 @@ bundle: kustomize operator-sdk ## Generate bundle manifests and metadata, then v
 	$(OPERATOR_SDK) generate kustomize manifests --interactive=false -q
 	cd config/manager && $(KUSTOMIZE) edit set image controller=$(IMG)
 	cd config/manifests/bases && $(KUSTOMIZE) edit set annotation containerImage:$(IMG)
-	cd config/default && $(KUSTOMIZE) edit set image kube-rbac-proxy=$(KRP_IMAGE_BASE):$(KRP_IMAGE_TAG)
+	cd config/default && $(KUSTOMIZE) edit set image kube-rbac-proxy=$(KRP_IMAGE_BASE):$(KRP_IMAGE_VERSION)
 	if [ -n "$(IMAGE_PULL_SECRET_NAME)" ]; then cd config/default && $(KUSTOMIZE) edit add patch --kind Deployment --group apps --version v1 --name controller-manager --patch '${image_pull_secrets_patch}'; fi
 	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS)
 	@printf "%s\n" '' 'LABEL com.redhat.openshift.versions="$(OPENSHIFT_VERSION)"' 'LABEL com.redhat.delivery.operator.bundle=true' 'LABEL com.redhat.delivery.backport=true' >> bundle.Dockerfile
@@ -221,7 +231,7 @@ ifeq (,$(shell which opm 2>/dev/null))
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(OPM)) ;\
-	curl -sSLo $(OPM) https://github.com/operator-framework/operator-registry/releases/download/v1.28.0/$(OS)-$(ARCH)-opm ;\
+	curl -sSLo $(OPM) https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/$(OS)-$(ARCH)-opm ;\
 	chmod +x $(OPM) ;\
 	}
 else

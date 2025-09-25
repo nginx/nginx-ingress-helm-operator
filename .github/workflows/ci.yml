@@ -163,6 +163,8 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [build, e2e-test]
     if: ${{ github.ref_type == 'tag' }}
+    env:
+      preflight_version: 1.14.1 # renovate: datasource=github-releaser depName=preflight packageName=redhat-openshift-ecosystem/openshift-preflight
     steps:
       - name: Checkout Repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -170,7 +172,7 @@ jobs:
       - name: Certify Images
         continue-on-error: false
         run: |
-          curl -fsSL https://github.com/redhat-openshift-ecosystem/openshift-preflight/releases/download/1.14.1/preflight-linux-amd64 --output preflight
+          curl -fsSL https://github.com/redhat-openshift-ecosystem/openshift-preflight/releases/download/${{ env.preflight_version }}/preflight-linux-amd64 --output preflight
           chmod +x preflight
 
           IFS=',' read -ra arch_list <<< "${{ env.platforms }}"
