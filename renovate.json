@@ -75,6 +75,7 @@
       ]
     },
     {
+      "customType": "regex",
       "description": "Update _VERSION variables in shell scripts and Makefiles",
       "managerFilePatterns": [
         "\\.sh$",
