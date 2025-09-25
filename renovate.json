@@ -1,6 +1,45 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "github>nginx/k8s-common",
+    "schedule:daily"
+  ],
+  "kubernetes": {
+    "managerFilePatterns": [
+      "/bundle/manifests/.+\\.yaml$/",
+      "/bundle/tests/scorecard/.+\\.yaml$/",
+      "/config/.+\\.yaml$/",
+      "/examples/.+\\.yaml$/",
+      "/helm-charts/nginx-ingress/crds/.+\\.yaml$/",
+      "/helm-charts/nginx-ingress/templates/.+\\.yaml$/"
+    ]
+  },
+  "helm": {
+    "commitMessageTopic": "helm values {{depName}}",
+    "managerFilePatterns": [
+      "/(^|/)values(?:-.+)\\.ya?ml$/"
+    ],
+    "pinDigests": false
+  },
+  "regexManagers": [
+    {
+      "description": "Update env variable version in Github Actions workflow",
+      "fileMatch": [
+        "/.github/workflows/.+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "\\s+.+?: (?<currentValue>.+?) # renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s"
+      ]
+    },
+    {
+      "description": "Update Operator SDK version in bundle Dockerfile",
+      "fileMatch": [
+        "bundle\\.Dockerfile$"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\sLABEL operators.operatorframework.io.metrics.builder=operator-sdk-(?<currentValue>.+?)\\s"
+      ]
+    }
+
   ]
 }
