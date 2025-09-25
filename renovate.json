@@ -14,15 +14,9 @@
       "/helm-charts/nginx-ingress/templates/.+\\.yaml$/"
     ]
   },
-  "helm": {
-    "commitMessageTopic": "helm values {{depName}}",
-    "managerFilePatterns": [
-      "/(^|/)values(?:-.+)\\.ya?ml$/"
-    ],
-    "pinDigests": false
-  },
-  "regexManagers": [
+  "customManagers": [
     {
+      "customType": "regex",
       "description": "Update env variable version in Github Actions workflow",
       "fileMatch": [
         "/.github/workflows/.+\\.ya?ml$/"
@@ -32,6 +26,7 @@
       ]
     },
     {
+      "customType": "regex",
       "description": "Update Operator SDK version in bundle Dockerfile",
       "fileMatch": [
         "bundle\\.Dockerfile$"
@@ -40,6 +35,5 @@
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\sLABEL operators.operatorframework.io.metrics.builder=operator-sdk-(?<currentValue>.+?)\\s"
       ]
     }
-
   ]
 }
