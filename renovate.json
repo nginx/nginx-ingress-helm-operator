@@ -19,7 +19,7 @@
       "customType": "regex",
       "description": "Update env variable version in Github Actions workflow",
       "managerFilePatterns": [
-        "//.github/workflows/.+\\.ya?ml$//"
+        "/.github/workflows/.+\\.ya?ml$/"
       ],
       "matchStrings": [
         "\\s+.+?: (?<currentValue>.+?) # renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s"
@@ -35,5 +35,6 @@
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\sLABEL operators.operatorframework.io.metrics.builder=operator-sdk-(?<currentValue>.+?)\\s"
       ]
     }
-  ]
+  ],
+  "timezone": "Europe/Dublin"
 }
