@@ -31,4 +31,4 @@ patches:
 images:
 - name: kube-rbac-proxy
   newName: quay.io/brancz/kube-rbac-proxy
-  newTag: v0.18.0
+  newTag: v0.20.0
