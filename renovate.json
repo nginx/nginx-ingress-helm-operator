@@ -84,7 +84,7 @@
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s[[:word:]]+?_VERSION = (?<currentValue>.+?)\\s"
       ]
-    },
+    }
   ],
   "timezone": "Europe/Dublin"
 }
