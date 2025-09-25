@@ -33,6 +33,16 @@
       ]
     }
   ],
+  "postUpdateOptions": [
+    "gomodTidy",
+    "gomodUpdateImportPaths",
+    "yarnDedupeHighest",
+    "npmDedupe"
+  ],
+  "pre-commit": {
+    "enabled": true
+  },
+  "rebaseWhen": "behind-base-branch",
   "kubernetes": {
     "managerFilePatterns": [
       "/bundle/manifests/.+\\.yaml$/",
@@ -63,7 +73,17 @@
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\sLABEL operators.operatorframework.io.metrics.builder=operator-sdk-(?<currentValue>.+?)\\s"
       ]
-    }
+    },
+    {
+      "description": "Update _VERSION variables in shell scripts and Makefiles",
+      "managerFilePatterns": [
+        "\\.sh$",
+        "(^|/)Makefile$"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s[[:word:]]+?_VERSION = (?<currentValue>.+?)\\s"
+      ]
+    },
   ],
   "timezone": "Europe/Dublin"
 }
