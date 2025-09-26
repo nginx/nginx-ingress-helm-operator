@@ -71,7 +71,7 @@ IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
 KRP_IMAGE_BASE ?= quay.io/brancz/kube-rbac-proxy
 
 # kube-rbac-proxy image tag
-# renovate: datasource=docker depName=depName=quay.io/brancz/kube-rbac-proxy
+# renovate: datasource=docker depName=kube-rbac-proxy packageName=quay.io/brancz/kube-rbac-proxy
 KRP_IMAGE_VERSION ?= v0.18.0
 
 # image pull secret name: eg regcred

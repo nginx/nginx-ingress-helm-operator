@@ -59,6 +59,16 @@
       "matchManagers": [
         "github-actions"
       ]
+    },
+    {
+      "matchPackageNames": ["/private-registry\\.nginx\\.com/"],
+      "matchDatasources": ["docker"],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": ["/registry\\.redhat\\.io/"],
+      "matchDatasources": ["docker"],
+      "enabled": false
     }
   ],
   "kubernetes": {
