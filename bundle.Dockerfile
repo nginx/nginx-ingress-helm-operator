@@ -8,7 +8,7 @@ LABEL operators.operatorframework.io.bundle.package.v1=nginx-ingress-operator
 LABEL operators.operatorframework.io.bundle.channels.v1=alpha
 LABEL operators.operatorframework.io.bundle.channel.default.v1=alpha
 # renovate: datasource=github-releases depName=operator-sdk packageName=operator-framework/operator-sdk
-LABEL operators.operatorframework.io.metrics.builder=operator-sdk-v1.40.0
+LABEL operators.operatorframework.io.metrics.builder=operator-sdk-v1.41.1
 LABEL operators.operatorframework.io.metrics.mediatype.v1=metrics+v1
 LABEL operators.operatorframework.io.metrics.project_layout=helm.sdk.operatorframework.io/v1
 
