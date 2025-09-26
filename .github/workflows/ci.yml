@@ -164,7 +164,7 @@ jobs:
     needs: [build, e2e-test]
     if: ${{ github.ref_type == 'tag' }}
     env:
-      preflight_version: 1.14.1 # renovate: datasource=github-releaser depName=preflight packageName=redhat-openshift-ecosystem/openshift-preflight
+      preflight_version: 1.14.1 # renovate: datasource=github-releases depName=preflight packageName=redhat-openshift-ecosystem/openshift-preflight
     steps:
       - name: Checkout Repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
