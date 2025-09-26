@@ -72,7 +72,7 @@ KRP_IMAGE_BASE ?= quay.io/brancz/kube-rbac-proxy
 
 # kube-rbac-proxy image tag
 # renovate: datasource=docker depName=kube-rbac-proxy packageName=quay.io/brancz/kube-rbac-proxy
-KRP_IMAGE_VERSION ?= v0.18.0
+KRP_IMAGE_VERSION ?= v0.20.0
 
 # image pull secret name: eg regcred
 IMAGE_PULL_SECRET_NAME ?=
