@@ -35,7 +35,7 @@ jobs:
         id: vars
         run: |
           runner=ubuntu-24.04
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
+          if [ "${{ github.event_name }}" == "push" ]; then
             runner=ubuntu-24.04-amd64
           fi
           echo "runner=$runner" >> $GITHUB_OUTPUT
