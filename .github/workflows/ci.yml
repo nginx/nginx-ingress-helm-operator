@@ -19,9 +19,34 @@ permissions:
   contents: read
 
 jobs:
+  variables:
+    name: Set Variables
+    runs-on: ubuntu-24.04
+    outputs:
+      runner: ${{ steps.vars.outputs.runner }}
+      version: ${{ steps.vars.outputs.version }}
+      chart_version: ${{ steps.vars.outputs.chart_version }}
+      openshift_version: ${{ steps.vars.outputs.openshift_version }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Output Variables
+        id: vars
+        run: |
+          runner=ubuntu-24.04
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            runner=ubuntu-24.04-amd64
+          fi
+          echo "runner=$runner" >> $GITHUB_OUTPUT
+          echo "version=$(git describe --tags)" >> $GITHUB_OUTPUT
+          echo "chart_version=$(yq '.appVersion' <helm-charts/nginx-ingress/Chart.yaml)" >> $GITHUB_OUTPUT
+          echo "openshift_version=$(yq '.annotations["com.redhat.openshift.versions"]' <bundle/metadata/annotations.yaml | cut -dv -f2)" >> $GITHUB_OUTPUT
+
   build:
     name: Build Image
-    runs-on: ubuntu-24.04-amd64
+    runs-on: ${{ needs.variables.outputs.runner }}
+    needs: [variables]
     outputs:
       version: ${{ steps.meta.outputs.version }}
     permissions:
@@ -64,13 +89,6 @@ jobs:
       - name: Docker Buildx
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
-      - name: Output Variables
-        id: vars
-        run: |
-          echo "version=$(git describe --tags)" >> $GITHUB_OUTPUT
-          echo "chart_version=$(yq '.appVersion' <helm-charts/nginx-ingress/Chart.yaml)" >> $GITHUB_OUTPUT
-          echo "openshift_version=$(yq '.annotations["com.redhat.openshift.versions"]' <bundle/metadata/annotations.yaml | cut -dv -f2)" >> $GITHUB_OUTPUT
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
@@ -88,7 +106,7 @@ jobs:
             name="NGINX Ingress Operator"
             maintainer="kubernetes@nginx.com"
             vendor="NGINX Inc"
-            version=${{ steps.vars.outputs.version }}
+            version=${{ needs.variables.outputs.version }}
             release=1
             summary="The NGINX Ingress Operator is a Kubernetes/OpenShift component which deploys and manages one or more NGINX/NGINX Plus Ingress Controllers"
             description="The NGINX Ingress Operator is a Kubernetes/OpenShift component which deploys and manages one or more NGINX/NGINX Plus Ingress Controllers"
@@ -139,8 +157,8 @@ jobs:
           major-label: "change"
           publish: false
           variables: |
-            nic_version=${{ steps.vars.outputs.chart_version }}
-            openshift_version=${{ steps.vars.outputs.openshift_version }}
+            nic_version=${{ needs.variables.outputs.chart_version }}
+            openshift_version=${{ needs.variables.outputs.openshift_version }}
           notes-footer: |
             ## Compatibility
 
@@ -153,4 +171,4 @@ jobs:
     uses: ./.github/workflows/e2e-test.yml
     needs: build
     with:
-      operator_version: edge
+      operator_version: ${{ needs.build.outputs.version }}
