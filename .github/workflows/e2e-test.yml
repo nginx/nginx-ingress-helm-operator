@@ -97,6 +97,7 @@ jobs:
       - name: Start Minikube
         run: |
           minikube start --kubernetes-version=${{ env.KUBERNETES_VERSION }} --driver=docker --memory=4g --cpus=2
+          minikube image load nginx/nginx-ingress-operator:${{ env.OPERATOR_VERSION }}
 
       - name: Verify Kubernetes cluster
         run: |

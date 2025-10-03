@@ -135,12 +135,14 @@ jobs:
           format: "sarif"
           output: "trivy-results.sarif"
           ignore-unfixed: "true"
+        if: github.event_name != 'pull_request'
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@303c0aef88fc2fe5ff6d63d3b1596bfd83dfa1f9 # v3.30.4
         continue-on-error: true
         with:
           sarif_file: "trivy-results.sarif"
+        if: github.event_name != 'pull_request'
 
       - name: Upload Scan Results
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -148,7 +150,7 @@ jobs:
         with:
           name: "trivy-results.sarif"
           path: "trivy-results.sarif"
-        if: always()
+        if: github.event_name != 'pull_request'
 
       - name: Create/Update Draft
         uses: lucacome/draft-release@fd099feb33710d1fa27b915a08a7acd6a1fb7fd2 # v2.0.0
