@@ -169,12 +169,14 @@ jobs:
           format: "sarif"
           output: "trivy-results.sarif"
           ignore-unfixed: "true"
+        if: ${{ ! inputs.dry_run }}
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@192325c86100d080feab897ff886c34abd4c83a3 # v3.30.3
         continue-on-error: true
         with:
           sarif_file: "trivy-results.sarif"
+        if: ${{ ! inputs.dry_run }}
 
       - name: Upload Scan Results
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -182,10 +184,10 @@ jobs:
         with:
           name: "trivy-results.sarif"
           path: "trivy-results.sarif"
-        if: always()
+        if: ${{ ! inputs.dry_run }}
 
   certify-openshift-images:
-    if: ${{ ! cancelled() && ! failure() && ! inputs.dry_run }}
+    if: ${{ ! cancelled() && ! failure() }}
     name: Certify for Red Hat OpenShift
     runs-on: ubuntu-24.04-amd64
     needs: [variables, build]
@@ -205,7 +207,7 @@ jobs:
 
           for arch in "${arch_list[@]}"; do
               architecture=("${arch#*/}")
-              ./preflight check container quay.io/nginx/nginx-ingress-operator:v${{ inputs.operator_version }} --pyxis-api-token ${{ secrets.PYXIS_API_TOKEN }} --certification-project-id ${{ secrets.CERTIFICATION_PROJECT_ID }} --platform $architecture --submit
+              ./preflight check container quay.io/nginx/nginx-ingress-operator:v${{ inputs.operator_version }} --pyxis-api-token ${{ secrets.PYXIS_API_TOKEN }} --certification-project-id ${{ secrets.CERTIFICATION_PROJECT_ID }} --platform $architecture ${{ ! inputs.dry_run && '--submit' || '' }}
           done
 
   github-release:
