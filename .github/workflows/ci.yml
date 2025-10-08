@@ -50,7 +50,7 @@ jobs:
     outputs:
       version: ${{ steps.meta.outputs.version }}
     permissions:
-      contents: read
+      contents: write # to create/update draft release
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       packages: write # for docker/build-push-action to push to GHCR
     steps:
