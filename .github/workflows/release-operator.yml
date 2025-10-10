@@ -132,8 +132,8 @@ jobs:
             ghcr.io/nginx/nginx-ingress-operator
             quay.io/nginx/nginx-ingress-operator
           tags: |
-            type=semver,pattern={{version}},value=v${{ inputs.operator_version }}
-            type=semver,pattern={{major}}.{{minor}},value=v${{ inputs.operator_version }}
+            type=semver,pattern={{version}},value=${{ inputs.operator_version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.operator_version }}
             type=raw,value=latest
           labels: |
             org.opencontainers.image.documentation=https://docs.nginx.com/nginx-ingress-controller
@@ -165,7 +165,7 @@ jobs:
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
         continue-on-error: true
         with:
-          image-ref: nginx/nginx-ingress-operator:v${{ inputs.operator_version }}
+          image-ref: nginx/nginx-ingress-operator:${{ inputs.operator_version }}
           format: "sarif"
           output: "trivy-results.sarif"
           ignore-unfixed: "true"
