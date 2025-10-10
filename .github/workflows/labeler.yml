@@ -10,9 +10,9 @@ jobs:
     permissions:
       contents: read
       pull-requests: write # for actions/labeler to add labels
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b # v5.0.0-alpha.1
+      - uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b # v6.0.1-alpha.1
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           sync-labels: true
