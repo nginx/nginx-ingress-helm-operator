@@ -237,3 +237,46 @@ jobs:
 
             - NGINX Ingress Controller {{nic_version}}
             - OpenShift {{openshift_version}} or newer.
+
+  create-pr:
+    name: Certify for Red Hat OpenShift
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Make
+        run: |
+          make bundle USE_IMAGE_DIGESTS=true
+
+      - name: Checkout certified-operators repo
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          token: ${{ secrets.NGINX_PAT }}
+          repository: nginx-bot/certified-operators
+          path: certified-operators
+
+      - name: Update certified-operators repo
+        working-directory: certified-operators/operators/nginx-ingress-operator
+        run: |
+          mkdir v${{ inputs.operator_version }}
+          cp -R ../../../bundle/manifests v${{ inputs.operator_version }}/
+          cp -R ../../../bundle/metadata v${{ inputs.operator_version }}/
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@778341af668090896ca464160c2def5d1d1a3eb0 # v6.0.1
+        with:
+          commit_message: operator nginx-ingress-operator (v${{ inputs.operator_version }})
+          commit_author: nginx-bot <integrations@nginx.com>
+          commit_user_name: nginx-bot
+          commit_user_email: integrations@nginx.com
+          create_branch: true
+          branch: update-nginx-ingress-operator-to-v${{ inputs.operator_version }}
+          repository: certified-operators
+
+      - name: Create PR
+        working-directory: certified-operators
+        run: |
+          gh pr create --title "operator nginx-ingress-operator (v${{ inputs.operator_version }})" --body "Update nginx-ingress-operator to v${{ inputs.operator_version }}" --head nginx-bot:update-nginx-ingress-operator-to-v${{ inputs.operator_version }} --base main --repo redhat-openshift-ecosystem/certified-operators
+        env:
+          GITHUB_TOKEN: ${{ secrets.NGINX_PAT }}
