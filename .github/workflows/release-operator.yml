@@ -237,3 +237,11 @@ jobs:
 
             - NGINX Ingress Controller {{nic_version}}
             - OpenShift {{openshift_version}} or newer.
+
+  create-pr:
+    name: Certify for Red Hat OpenShift
+    needs: [certify-openshift-images]
+    uses: ./.github/workflows/create-operator-pr.yml
+    with:
+      version: ${{ inputs.operator_version }}
+    secrets: inherit
