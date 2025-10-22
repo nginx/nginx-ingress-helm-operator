@@ -7,6 +7,12 @@ on:
         type: string
         description: The version of the operator to submit for approval
         required: true
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        description: The version of the operator to submit for approval
+        required: true
 
 concurrency:
   group: ${{ github.ref_name }}-create-operator-pr
