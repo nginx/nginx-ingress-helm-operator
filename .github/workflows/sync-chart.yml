@@ -120,7 +120,7 @@ jobs:
       - name: Update REPLACES to current version
         run: |
           current_replaces=$(grep -E '^REPLACES' Makefile | awk -F'=' '{ print $2 }' | xargs)
-          current_version=$(egrep '^VERSION' Makefile | awk '{ print $3 }')
+          current_version=$(grep -E '^VERSION' Makefile | awk '{ print $3 }')
           echo "Current REPLACES: $current_replaces"
           echo "Will set REPLACES to: nginx-ingress-operator.v$current_version"
           sed -i "s|^REPLACES ?= .*|REPLACES ?= nginx-ingress-operator.v$current_version|" Makefile
