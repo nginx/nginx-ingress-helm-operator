@@ -217,7 +217,7 @@ bundle: kustomize operator-sdk ## Generate bundle manifests and metadata, then v
 	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS)
 	@if [ -n "$(REPLACES)" ]; then \
 		echo "Adding replaces: $(REPLACES) to ClusterServiceVersion"; \
-		sed -i.bak 's|^  provider:|  replaces: $(REPLACES)\n  provider:|' bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml && \
+		sed -i.bak -e '/^  provider:/i\' -e '  replaces: $(REPLACES)' bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml && \
 		rm -f bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml.bak; \
 	fi
 	@echo "Adding skips: [] to ClusterServiceVersion"; \
