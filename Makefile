@@ -221,7 +221,9 @@ bundle: kustomize operator-sdk ## Generate bundle manifests and metadata, then v
 		rm -f bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml.bak; \
 	fi
 	@echo "Adding skips: [] to ClusterServiceVersion"; \
-	sed -i.bak 's|^  version:|  skips: []\n  version:|' bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml && \
+	sed -i.bak -e '/^  version:/i\
+	  skips: []
+	' bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml && \
 	rm -f bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml.bak
 	@printf "%s\n" '' 'LABEL com.redhat.openshift.versions="$(OPENSHIFT_VERSION)"' 'LABEL com.redhat.delivery.operator.bundle=true' 'LABEL com.redhat.delivery.backport=true' >> bundle.Dockerfile
 	@printf "%s\n" '' '  # OpenShift annotations.' '  com.redhat.openshift.versions: $(OPENSHIFT_VERSION)' >> bundle/metadata/annotations.yaml
