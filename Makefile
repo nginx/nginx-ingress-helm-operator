@@ -217,13 +217,11 @@ bundle: kustomize operator-sdk ## Generate bundle manifests and metadata, then v
 	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS)
 	@if [ -n "$(REPLACES)" ]; then \
 		echo "Adding replaces: $(REPLACES) to ClusterServiceVersion"; \
-		REPLACES_LINE=$$(printf "  replaces: %s" "$(REPLACES)"); \
-		sed -i.bak "/^  provider:/i\\$${REPLACES_LINE}" bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml && \
+		sed -i.bak '/^  provider:/{h;s/.*/  replaces: $(REPLACES)/;p;x;}' bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml && \
 		rm -f bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml.bak; \
 	fi
 	@echo "Adding skips: [] to ClusterServiceVersion"; \
-	SKIPS_LINE=$$(printf "  skips: []"); \
-	sed -i.bak "/^  version:/i\\$${SKIPS_LINE}" bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml && \
+	sed -i.bak '/^  version:/{h;s/.*/  skips: []/;p;x;}' bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml && \
 	rm -f bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml.bak
 	@printf "%s\n" '' 'LABEL com.redhat.openshift.versions="$(OPENSHIFT_VERSION)"' 'LABEL com.redhat.delivery.operator.bundle=true' 'LABEL com.redhat.delivery.backport=true' >> bundle.Dockerfile
 	@printf "%s\n" '' '  # OpenShift annotations.' '  com.redhat.openshift.versions: $(OPENSHIFT_VERSION)' >> bundle/metadata/annotations.yaml
