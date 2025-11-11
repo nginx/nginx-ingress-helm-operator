@@ -230,7 +230,7 @@ spec:
     enableEgress: false
  ```
 
-For detailed documentation of individual parameters, please refer to the [Configuration](https://docs.nginx.com/nginx-ingress-controller/installation/installing-nic/installation-with-helm/#configuration) section in our documentation on installing NGINX Ingress Controller with Helm.
+For detailed documentation of individual parameters, please refer to the [Configuration](https://docs.nginx.com/nginx-ingress-controller/install/helm/#configuration) section in our documentation on installing NGINX Ingress Controller with Helm.
 
 ## Notes
 * The service account name cannot be overridden and needs to be set to `nginx-ingress`. This is a requirement due to the RBAC and SCC configuration on OpenShift clusters.
@@ -238,7 +238,7 @@ For detailed documentation of individual parameters, please refer to the [Config
 * If required, the `controller.wildcardTLS.secret` must also be created separately with the name of the secret supplied in the NginxIngress manifest.
 
 ## Notes: Multiple NIC Deployments
-* Please see [the NGINX Ingress Controller doumentation](https://docs.nginx.com/nginx-ingress-controller/installation/running-multiple-ingress-controllers/) for general information on running multiple NGINX Ingress Controllers in your cluster.
+* Please see [the NGINX Ingress Controller doumentation](https://docs.nginx.com/nginx-ingress-controller/install/multiple-controllers/) for general information on running multiple NGINX Ingress Controllers in your cluster.
 * To run multiple NIC instances deployed by the NGINX Ingress Operator in your cluster in the same namespace, `rbac.create` should be set to `false`, and the ServiceAccount and ClusterRoleBinding need to be created independently of the deployments. Please note that `controller.serviceAccount.imagePullSecretName` will also be ignored in this configuration, and will need to be configured as part of the independant ServiceAccount creation.
 * The ClusterRoleBinding needs to configured to bind to the `nginx-ingress-operator-nginx-ingress-admin` ClusterRole.
 * See [RBAC example spec](../resources/rbac-example.yaml) for an example ServiceAccount and ClusterRoleBinding manifest.

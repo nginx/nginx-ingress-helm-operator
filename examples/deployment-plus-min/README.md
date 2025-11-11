@@ -6,9 +6,9 @@ In this example we deploy the NGINX Ingress Controller (edge) as a [Deployment](
 
 1. Have the NGINX Ingress Operator deployed in your cluster. Follow [installation](../../README.md#installation) steps.
 2. Build the NGINX Ingress Controller for Plus image and push it to a private repository following
-[these instructions](https://docs.nginx.com/nginx-ingress-controller/installation/building-ingress-controller-image/#building-the-image-and-pushing-it-to-the-private-registry)
+[these instructions](https://docs.nginx.com/nginx-ingress-controller/install/build/#building-the-image-and-pushing-it-to-the-private-registry)
 (**Note**: For the build process, if using OpenShift, use the `ubi-image-plus`, `ubi-image-nap-plus`, `ubi-image-dos-plus` or `ubi-image-nap-dos-plus` targets).
-3. Setup your NGINX Plus [license](https://docs.nginx.com/nginx-ingress-controller/installation/create-license-secret/) `Secret` 
+3. Setup your NGINX Plus [license](https://docs.nginx.com/nginx-ingress-controller/install/license-secret/) `Secret` 
 
 If you would like to use TransportServers, refer to [this section](README.md#TransportServers) for additional pre-requisites.
 

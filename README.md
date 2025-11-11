@@ -11,7 +11,7 @@ Learn more about operators in the [Kubernetes Documentation](https://kubernetes.
 
 To install a specific version of the NGINX Ingress Controller with the operator, a specific version of the NGINX Ingress Operator is required.
 
-Up until version 0.5.1, this Operator was Go based. Version 1.0.0 marks an incompatible upgrade as this release switched the Operator to being Helm-based, built from the [NGINX Ingress Controller Helm chart](http://helm.nginx.com/#nginx-ingress-controller). The configuration for the Helm chart can be seen in the [NGINX Ingress Controller documentation](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#configuration).
+Up until version 0.5.1, this Operator was Go based. Version 1.0.0 marks an incompatible upgrade as this release switched the Operator to being Helm-based, built from the [NGINX Ingress Controller Helm chart](http://helm.nginx.com/#nginx-ingress-controller). The configuration for the Helm chart can be seen in the [NGINX Ingress Controller documentation](https://docs.nginx.com/nginx-ingress-controller/install/helm#configuration).
 
 The following table shows the relation between the versions of the two projects:
 
@@ -61,11 +61,11 @@ Note: The NGINX Ingress Operator works only for NGINX Ingress Controller version
      - Set the `controller.nginxPlus` to true
      - Set the `controller.image.repository` and `controller.image.tag` to the appropriate values
      - Set the `controller.serviceAccount.imagePullSecretName` if applicable
-   - For full configuration details see the Helm documentation [here](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#configuration).
+   - For full configuration details see the Helm documentation [here](https://docs.nginx.com/nginx-ingress-controller/install/helm/#configuration).
 
 ## Notes: Multiple NIC Deployments
 
-- Please see [the NGINX Ingress Controller documentation](https://docs.nginx.com/nginx-ingress-controller/installation/running-multiple-ingress-controllers/) for general information on running multiple NGINX Ingress Controllers in your cluster.
+- Please see [the NGINX Ingress Controller documentation](https://docs.nginx.com/nginx-ingress-controller/install/multiple-controllers/) for general information on running multiple NGINX Ingress Controllers in your cluster.
 - To run multiple NIC instances deployed by the NGINX Ingress Operator in your cluster in the same namespace, `rbac.create` should be set to `false`, and the ServiceAccount and ClusterRoleBinding need to be created independently of the deployments. Please note that `controller.serviceAccount.imagePullSecretName` will also be ignored in this configuration, and will need to be configured as part of the independent ServiceAccount creation.
 - The ClusterRoleBinding needs to configured to bind to the `nginx-ingress-operator-nginx-ingress-admin` ClusterRole.
 - See [RBAC example spec](./resources/rbac-example.yaml) for an example ServiceAccount and ClusterRoleBinding manifest.
