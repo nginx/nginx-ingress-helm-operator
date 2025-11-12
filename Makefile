@@ -5,6 +5,10 @@
 # - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
 VERSION ?= 3.3.1
 
+# REPLACES defines the operator version that this version replaces for upgrades (OLM path).
+# Set to empty to disable (e.g make bundle REPLACES=)
+REPLACES ?= nginx-ingress-operator.v3.2.3
+
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")
 # To re-generate a bundle for other specific channels without changing the standard setup, you can:
@@ -211,6 +215,14 @@ bundle: kustomize operator-sdk ## Generate bundle manifests and metadata, then v
 	cd config/default && $(KUSTOMIZE) edit set image kube-rbac-proxy=$(KRP_IMAGE_BASE):$(KRP_IMAGE_VERSION)
 	if [ -n "$(IMAGE_PULL_SECRET_NAME)" ]; then cd config/default && $(KUSTOMIZE) edit add patch --kind Deployment --group apps --version v1 --name controller-manager --patch '${image_pull_secrets_patch}'; fi
 	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS)
+	@if [ -n "$(REPLACES)" ]; then \
+		echo "Adding replaces: $(REPLACES) to ClusterServiceVersion"; \
+		sed -i.bak '/^  provider:/{h;s/.*/  replaces: $(REPLACES)/;p;x;}' bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml && \
+		rm -f bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml.bak; \
+	fi
+	@echo "Adding skips: [] to ClusterServiceVersion"; \
+	sed -i.bak '/^  version:/{h;s/.*/  skips: []/;p;x;}' bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml && \
+	rm -f bundle/manifests/nginx-ingress-operator.clusterserviceversion.yaml.bak
 	@printf "%s\n" '' 'LABEL com.redhat.openshift.versions="$(OPENSHIFT_VERSION)"' 'LABEL com.redhat.delivery.operator.bundle=true' 'LABEL com.redhat.delivery.backport=true' >> bundle.Dockerfile
 	@printf "%s\n" '' '  # OpenShift annotations.' '  com.redhat.openshift.versions: $(OPENSHIFT_VERSION)' >> bundle/metadata/annotations.yaml
 	$(OPERATOR_SDK) bundle validate ./bundle
