@@ -32,7 +32,7 @@ Install the latest version of the Operator following the steps outlined in [Open
 
 ### 4. Deploy new ingress controller deployments
 
-Use the new Nginx Ingress Operator installation to deploy Nginx Ingress Controller - see the release notes [here](https://docs.nginx.com/nginx-ingress-controller/releases/#nginx-ingress-controller-3-5-1) and a guide to the Helm configuration parameters [here](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#configuration)
+Use the new Nginx Ingress Operator installation to deploy Nginx Ingress Controller - see the release notes [here](https://docs.nginx.com/nginx-ingress-controller/releases/#nginx-ingress-controller-3-5-1) and a guide to the Helm configuration parameters [here](https://docs.nginx.com/nginx-ingress-controller/install/helm/#configuration)
 
 ## Manual upgrade - 0.5.1 to 1.0.0
 
@@ -57,4 +57,4 @@ Install the latest version of the Operator following the steps outlined in [manu
 
 ### 4. Deploy new ingress controller deployments
 
-Use the new Nginx Ingress Operator installation to deploy Nginx Ingress Controller - see the release notes [here](https://docs.nginx.com/nginx-ingress-controller/releases/#nginx-ingress-controller-3-5-1) and a guide to the Helm configuration parameters [here](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#configuration)
+Use the new Nginx Ingress Operator installation to deploy Nginx Ingress Controller - see the release notes [here](https://docs.nginx.com/nginx-ingress-controller/releases/#nginx-ingress-controller-3-5-1) and a guide to the Helm configuration parameters [here](https://docs.nginx.com/nginx-ingress-controller/install/helm/#configuration)
