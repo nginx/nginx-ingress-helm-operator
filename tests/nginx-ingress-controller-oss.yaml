@@ -11,7 +11,7 @@ spec:
     image:
       pullPolicy: Always
       repository: nginx/nginx-ingress
-      tag: 5.2.1
+      tag: 5.3.0
     ingressClass:
       name: nginx
     kind: deployment

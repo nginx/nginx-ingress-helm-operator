@@ -17,7 +17,7 @@ The following table shows the relation between the versions of the two projects:
 
 | NGINX Ingress Controller | NGINX Ingress Operator |
 | ------------------------ | ---------------------- |
-| 5.2.x                    | 3.3.1                  |
+| 5.2.x                    | 3.4.0                  |
 | 5.1.x                    | 3.2.3                  |
 | 5.0.x                    | 3.1.0                  |
 | 4.0.x                    | 3.0.1                  |
@@ -80,7 +80,7 @@ See [upgrade docs](./docs/upgrades.md)
 
 We publish NGINX Ingress Operator releases on GitHub. See our [releases page](https://github.com/nginx/nginx-ingress-helm-operator/releases).
 
-The latest stable release is [3.3.1](https://github.com/nginx/nginx-ingress-helm-operator/releases/tag/v3.3.1). For production use, we recommend that you choose the latest stable release.
+The latest stable release is [3.4.0](https://github.com/nginx/nginx-ingress-helm-operator/releases/tag/v3.4.0). For production use, we recommend that you choose the latest stable release.
 
 ## Development
 
