@@ -7,7 +7,7 @@ VERSION ?= 3.4.0
 
 # REPLACES defines the operator version that this version replaces for upgrades (OLM path).
 # Set to empty to disable (e.g make bundle REPLACES=)
-REPLACES ?= nginx-ingress-operator.v3.4.0
+REPLACES ?= nginx-ingress-operator.v3.3.1
 
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")
