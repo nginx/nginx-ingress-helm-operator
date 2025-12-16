@@ -119,14 +119,41 @@ jobs:
           kubectl get deployments -n nginx-ingress-operator-system
           kubectl get pods -n nginx-ingress-operator-system
           
+          # Verify pods are ready
+          kubectl wait --for=condition=Ready --timeout=60s pod --all -n nginx-ingress-operator-system
+          
           # Check operator logs
           kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system --tail=50
+          
+          # Verify the operator can see the CRDs
+          echo "Verifying CRDs are installed:"
+          kubectl get crd | grep nginx
+          
+          # Check if the operator is watching for NginxIngress resources
+          echo "Checking operator configuration:"
+          kubectl describe deployment nginx-ingress-operator-controller-manager -n nginx-ingress-operator-system
 
       - name: Deploy Example NGINX Ingress Controller
         run: |
           # Create the namespace and NGINX Ingress Controller instance in namespace nginx-ingress
           kubectl create namespace nginx-ingress
+          
+          # Check if the NginxIngress CRD exists
+          echo "Checking if NginxIngress CRD is installed:"
+          kubectl get crd nginxingresses.charts.nginx.org || echo "CRD not found!"
+          
+          # Apply the NginxIngress custom resource
+          echo "Applying NginxIngress custom resource:"
           kubectl apply -f tests/nginx-ingress-controller-oss.yaml
+          
+          # Check if the NginxIngress resource was created successfully
+          echo "Checking NginxIngress resource status:"
+          kubectl get nginxingress -n nginx-ingress
+          kubectl describe nginxingress my-nginx-ingress -n nginx-ingress
+          
+          # Check operator logs immediately after applying the resource
+          echo "=== Operator logs after applying NginxIngress ==="
+          kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system --tail=20
           
           # Wait for the operator to process and install the Helm release
           echo "Waiting for operator to install Helm release..."
@@ -136,12 +163,28 @@ jobs:
           echo "Checking deployments in nginx-ingress namespace:"
           kubectl get deployments -n nginx-ingress
           
+          # Check all resources in the namespace
+          echo "Checking all resources in nginx-ingress namespace:"
+          kubectl get all -n nginx-ingress
+          
+          # Check if there are any Helm releases
+          echo "Checking for Helm releases:"
+          kubectl get secrets -n nginx-ingress -l owner=helm || echo "No Helm releases found"
+          
           # Find the actual deployment name
           DEPLOYMENT_NAME=$(kubectl get deployments -n nginx-ingress -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
           
           if [ -z "$DEPLOYMENT_NAME" ]; then
             echo "No deployment found, waiting longer..."
             sleep 30
+            
+            # More debugging
+            echo "=== Additional operator logs ==="
+            kubectl logs -l control-plane=controller-manager -n nginx-ingress-operator-system --tail=50
+            
+            echo "=== NginxIngress resource status ==="
+            kubectl get nginxingress -n nginx-ingress -o yaml
+            
             kubectl get deployments -n nginx-ingress
             DEPLOYMENT_NAME=$(kubectl get deployments -n nginx-ingress -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
           fi
@@ -154,6 +197,7 @@ jobs:
             kubectl wait --for=condition=Available --timeout=300s deployment/$DEPLOYMENT_NAME -n nginx-ingress
           else
             echo "Failed to find any deployment in nginx-ingress namespace"
+            echo "This indicates the operator is not processing the NginxIngress resource correctly"
             exit 1
           fi
       - name: Verify NGINX Ingress Controller Deployment
