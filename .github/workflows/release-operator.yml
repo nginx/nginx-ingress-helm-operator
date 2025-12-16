@@ -172,7 +172,7 @@ jobs:
         if: ${{ ! inputs.dry_run }}
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@4e94bd11f71e507f7f87df81788dff88d1dacbfb # v4.31.0
+        uses: github/codeql-action/upload-sarif@1b168cd39490f61582a9beae412bb7057a6b2c4e # v4.31.8
         continue-on-error: true
         with:
           sarif_file: "trivy-results.sarif"
@@ -192,7 +192,7 @@ jobs:
     runs-on: ubuntu-24.04-amd64
     needs: [variables, build]
     env:
-      preflight_version: 1.14.1 # renovate: datasource=github-releases depName=preflight packageName=redhat-openshift-ecosystem/openshift-preflight
+      preflight_version: 1.15.2 # renovate: datasource=github-releases depName=preflight packageName=redhat-openshift-ecosystem/openshift-preflight
       submit_results: ${{ ! inputs.dry_run && '--submit' || '' }}
     steps:
       - name: Checkout Repository
