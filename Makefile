@@ -66,7 +66,7 @@ OPM_VERSION ?= v1.61.0
 # Set the Kustomize version to use. By default, what is installed on the system is used.
 # This is useful for CI or a project to utilize a specific version of the kustomize toolkit.
 # renovate: datasource=github-releases depName=kustomize packageName=kubernetes-sigs/kustomize
-KUSTOMIZE_VERSION ?= v5.0.1
+KUSTOMIZE_VERSION ?= v5.8.0
 
 # Image URL to use all building/pushing image targets
 IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
@@ -167,7 +167,7 @@ ifeq (,$(shell which kustomize 2>/dev/null))
 	@{ \
 	set -e ;\
 	mkdir -p $(dir $(KUSTOMIZE)) ;\
-	curl -sSLo - https://github.com/kubernetes-sigs/kustomize/releases/download/$(KUSTOMIZE_VERSION)/kustomize_$(KUSTOMIZE_VERSION)_$(OS)_$(ARCH).tar.gz | \
+	curl -sSLo - https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F$(KUSTOMIZE_VERSION)/kustomize_$(KUSTOMIZE_VERSION)_$(OS)_$(ARCH).tar.gz | \
 	tar xzf - -C bin/ ;\
 	}
 else
