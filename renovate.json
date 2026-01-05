@@ -115,6 +115,17 @@
     },
     {
       "customType": "regex",
+      "description": "Update KUSTOMIZE_VERSION variable in Makefile",
+      "managerFilePatterns": [
+        "/Makefile$/"
+      ],
+      "extractVersionTemplate": "^kustomize\/v?(?<version>.*)$",
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)?(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\sKUSTOMIZE_VERSION \\??= (?<currentValue>.+?)\\s"
+      ]
+    },
+    {
+      "customType": "regex",
       "description": "Update _VERSION variables in Dockerfiles",
       "managerFilePatterns": [
         "(^|/|\\.)Dockerfile$",
