@@ -117,14 +117,6 @@ jobs:
           regex: false
           exclude: .github/**
 
-      - name: Update REPLACES to current version
-        run: |
-          current_replaces=$(grep -E '^REPLACES' Makefile | awk -F'=' '{ print $2 }' | xargs)
-          current_version=$(grep -E '^VERSION' Makefile | awk '{ print $3 }')
-          echo "Current REPLACES: $current_replaces"
-          echo "Will set REPLACES to: nginx-ingress-operator.v$current_version"
-          sed -i "s|^REPLACES ?= .*|REPLACES ?= nginx-ingress-operator.v$current_version|" Makefile
-
       - name: Find and Replace Operator version
         uses: jacobtomlinson/gha-find-replace@f1069b438f125e5395d84d1c6fd3b559a7880cb5 # v3.0.5
         with:
@@ -132,6 +124,14 @@ jobs:
           replace: ${{ steps.sync.outputs.new_operator_version }}
           regex: false
           exclude: .github/**
+
+      - name: Update REPLACES to current version
+        run: |
+          current_replaces=$(grep -E '^REPLACES' Makefile | awk -F'=' '{ print $2 }' | xargs)
+          current_version="${{ steps.sync.outputs.current_operator_version }}"
+          echo "Current REPLACES: $current_replaces"
+          echo "Will set REPLACES to: nginx-ingress-operator.v$current_version"
+          sed -i "s|^REPLACES ?= .*|REPLACES ?= nginx-ingress-operator.v$current_version|" Makefile
 
       - name: Update bundle files
         run: |
