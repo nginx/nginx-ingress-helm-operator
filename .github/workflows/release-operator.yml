@@ -192,7 +192,7 @@ jobs:
     runs-on: ubuntu-24.04-amd64
     needs: [variables, build]
     env:
-      preflight_version: 1.14.1 # renovate: datasource=github-releases depName=preflight packageName=redhat-openshift-ecosystem/openshift-preflight
+      preflight_version: 1.16.0 # renovate: datasource=github-releases depName=preflight packageName=redhat-openshift-ecosystem/openshift-preflight
       submit_results: ${{ ! inputs.dry_run && '--submit' || '' }}
     steps:
       - name: Checkout Repository
@@ -208,7 +208,7 @@ jobs:
 
           for arch in "${arch_list[@]}"; do
               architecture=("${arch#*/}")
-              ./preflight check container quay.io/nginx/nginx-ingress-operator:${{ inputs.operator_version }} --pyxis-api-token ${{ secrets.PYXIS_API_TOKEN }} --certification-project-id ${{ secrets.CERTIFICATION_PROJECT_ID }} --platform $architecture ${{ env.submit_results }}
+              ./preflight check container quay.io/nginx/nginx-ingress-operator:${{ inputs.operator_version }} --pyxis-api-token ${{ secrets.PYXIS_API_TOKEN }} --certification-component-id ${{ secrets.CERTIFICATION_PROJECT_ID }} --platform $architecture ${{ env.submit_results }}
           done
 
   github-release:
