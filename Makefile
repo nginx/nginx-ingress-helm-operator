@@ -61,7 +61,7 @@ endif
 OPERATOR_SDK_VERSION ?= v1.41.1
 
 # renovate: datasource=github-releases depName=operator-registry packageName=operator-framework/operator-registry
-OPM_VERSION ?= v1.61.0
+OPM_VERSION ?= v1.62.0
 
 # Set the Kustomize version to use. By default, what is installed on the system is used.
 # This is useful for CI or a project to utilize a specific version of the kustomize toolkit.
@@ -76,7 +76,7 @@ KRP_IMAGE_BASE ?= quay.io/brancz/kube-rbac-proxy
 
 # kube-rbac-proxy image tag
 # renovate: datasource=docker depName=kube-rbac-proxy packageName=quay.io/brancz/kube-rbac-proxy
-KRP_IMAGE_VERSION ?= v0.20.1
+KRP_IMAGE_VERSION ?= v0.20.2
 
 # image pull secret name: eg regcred
 IMAGE_PULL_SECRET_NAME ?=

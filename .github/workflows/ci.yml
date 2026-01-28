@@ -29,7 +29,7 @@ jobs:
       openshift_version: ${{ steps.vars.outputs.openshift_version }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Output Variables
         id: vars
@@ -55,7 +55,7 @@ jobs:
       packages: write # for docker/build-push-action to push to GHCR
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: DockerHub Login
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
@@ -138,7 +138,7 @@ jobs:
         if: github.event_name != 'pull_request'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@5d4e8d1aca955e8d8589aabd499c5cae939e33c7 # v4.31.9
+        uses: github/codeql-action/upload-sarif@b20883b0cd1f46c72ae0ba6d1090936928f9fa30 # v4.32.0
         continue-on-error: true
         with:
           sarif_file: "trivy-results.sarif"
@@ -153,7 +153,7 @@ jobs:
         if: github.event_name != 'pull_request'
 
       - name: Create/Update Draft
-        uses: lucacome/draft-release@0ebb400b90474a1b791602046abf8394e9f5402d # v2.0.2
+        uses: lucacome/draft-release@63b16bb66ce9106da096d2c903216742430e9f56 # v2.0.3
         with:
           minor-label: "enhancement"
           major-label: "change"
