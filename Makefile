@@ -58,7 +58,7 @@ endif
 # Set the Operator SDK version to use. By default, what is installed on the system is used.
 # This is useful for CI or a project to utilize a specific version of the operator-sdk toolkit.
 # renovate: datasource=github-releases depName=operator-sdk packageName=operator-framework/operator-sdk
-OPERATOR_SDK_VERSION ?= v1.41.1
+OPERATOR_SDK_VERSION ?= v1.42.0
 
 # renovate: datasource=github-releases depName=operator-registry packageName=operator-framework/operator-registry
 OPM_VERSION ?= v1.63.0
