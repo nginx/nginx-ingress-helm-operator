@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.21
-FROM quay.io/operator-framework/helm-operator:v1.41.1
+FROM quay.io/operator-framework/helm-operator:v1.42.0
 
 ENV HOME=/opt/helm
 COPY watches.yaml ${HOME}/watches.yaml
