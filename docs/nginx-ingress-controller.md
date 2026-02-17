@@ -50,7 +50,7 @@ spec:
     customPorts: []
     image:
       repository: nginx/nginx-ingress
-      tag: "5.3.3-ubi"
+      tag: "5.3.4-ubi"
       # digest: "sha256:CHANGEME"
       pullPolicy: IfNotPresent
     lifecycle: {}
