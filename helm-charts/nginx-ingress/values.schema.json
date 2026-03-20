@@ -701,10 +701,10 @@
             },
             "tag": {
               "type": "string",
-              "default": "5.3.4",
+              "default": "5.4.0",
               "title": "The tag of the Ingress Controller image",
               "examples": [
-                "5.3.4"
+                "5.4.0"
               ]
             },
             "digest": {
@@ -740,7 +740,7 @@
           "examples": [
             {
               "repository": "nginx/nginx-ingress",
-              "tag": "5.3.4",
+              "tag": "5.4.0",
               "pullPolicy": "IfNotPresent"
             }
           ]
@@ -1331,6 +1331,11 @@
               "default": "",
               "title": "The loadBalancerIP",
               "$ref": "file://./helm-charts/nginx-ingress/v1.35.1/_definitions.json#/definitions/io.k8s.api.core.v1.ServiceSpec/properties/loadBalancerIP"
+            },
+            "loadBalancerClass": {
+              "default": "",
+              "title": "The loadBalancerClass",
+              "$ref": "file://./helm-charts/nginx-ingress/v1.35.1/_definitions.json#/definitions/io.k8s.api.core.v1.ServiceSpec/properties/loadBalancerClass"
             },
             "externalIPs": {
               "default": [],
@@ -2068,7 +2073,7 @@
           "customPorts": [],
           "image": {
             "repository": "nginx/nginx-ingress",
-            "tag": "5.3.4",
+            "tag": "5.4.0",
             "digest": "",
             "pullPolicy": "IfNotPresent"
           },
@@ -2709,7 +2714,7 @@
         "customPorts": [],
         "image": {
           "repository": "nginx/nginx-ingress",
-          "tag": "5.3.4",
+          "tag": "5.4.0",
           "digest": "",
           "pullPolicy": "IfNotPresent"
         },
