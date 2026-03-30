@@ -1,9 +1,10 @@
 # syntax=docker/dockerfile:1.22
-FROM quay.io/operator-framework/helm-operator:v1.41.1
+FROM quay.io/operator-framework/helm-operator:v1.42.2
 
 ENV HOME=/opt/helm
 COPY watches.yaml ${HOME}/watches.yaml
 COPY helm-charts  ${HOME}/helm-charts
+COPY helm-charts  /helm-charts 
 WORKDIR ${HOME}
 
 COPY LICENSE /licenses/
