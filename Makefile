@@ -61,7 +61,7 @@ endif
 OPERATOR_SDK_VERSION ?= v1.42.2
 
 # renovate: datasource=github-releases depName=operator-registry packageName=operator-framework/operator-registry
-OPM_VERSION ?= v1.64.0
+OPM_VERSION ?= v1.65.0
 
 # Set the Kustomize version to use. By default, what is installed on the system is used.
 # This is useful for CI or a project to utilize a specific version of the kustomize toolkit.
