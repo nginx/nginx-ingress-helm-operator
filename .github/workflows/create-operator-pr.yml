@@ -44,23 +44,23 @@ jobs:
         working-directory: certified-operators/operators/nginx-ingress-operator
         run: |
           mkdir v${{ inputs.version }}
-          cp -R ../../../bundle/manifests v${{ inputs.version }}/
-          cp -R ../../../bundle/metadata v${{ inputs.version }}/
+          cp -R ../../../bundle/manifests ${{ inputs.version }}/
+          cp -R ../../../bundle/metadata ${{ inputs.version }}/
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
         with:
-          commit_message: operator nginx-ingress-operator (v${{ inputs.version }})
+          commit_message: operator nginx-ingress-operator (${{ inputs.version }})
           commit_author: nginx-bot <integrations@nginx.com>
           commit_user_name: nginx-bot
           commit_user_email: integrations@nginx.com
           create_branch: true
-          branch: update-nginx-ingress-operator-to-v${{ inputs.version }}
+          branch: update-nginx-ingress-operator-to-${{ inputs.version }}
           repository: certified-operators
 
       - name: Create PR
         working-directory: certified-operators
         run: |
-          gh pr create --title "operator nginx-ingress-operator (v${{ inputs.version }})" --body "Update nginx-ingress-operator to v${{ inputs.version }}" --head nginx-bot:update-nginx-ingress-operator-to-v${{ inputs.version }} --base main --repo redhat-openshift-ecosystem/certified-operators
+          gh pr create --title "operator nginx-ingress-operator (${{ inputs.version }})" --body "Update nginx-ingress-operator to ${{ inputs.version }}" --head nginx-bot:update-nginx-ingress-operator-to-${{ inputs.version }} --base main --repo redhat-openshift-ecosystem/certified-operators
         env:
           GITHUB_TOKEN: ${{ secrets.NGINX_PAT }}
