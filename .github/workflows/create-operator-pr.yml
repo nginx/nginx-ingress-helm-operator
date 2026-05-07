@@ -43,7 +43,7 @@ jobs:
       - name: Update certified-operators repo
         working-directory: certified-operators/operators/nginx-ingress-operator
         run: |
-          mkdir v${{ inputs.version }}
+          mkdir -p ${{ inputs.version }}
           cp -R ../../../bundle/manifests ${{ inputs.version }}/
           cp -R ../../../bundle/metadata ${{ inputs.version }}/
 
