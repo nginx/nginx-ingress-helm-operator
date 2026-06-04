@@ -71,11 +71,12 @@ kubectl logs -n nginx-ingress-operator-system deployment/nginx-ingress-operator-
 ### Tier 4: OLM Scorecard
 
 ```bash
-# Build bundle image
+# Build and push bundle image (scorecard pulls it from the registry)
 make bundle-build bundle-push
 
-# Run scorecard
-operator-sdk scorecard ./bundle
+# Run scorecard against the published bundle image
+# BUNDLE_IMG defaults to quay.io/nginx/nginx-ingress-operator-bundle:v$(VERSION)
+operator-sdk scorecard $(BUNDLE_IMG)
 ```
 
 ### Tier 5: E2E (CI Only)
@@ -120,6 +121,6 @@ When adding features, verify:
 - **Bundle validation is fast** — Always run `make bundle` even for small changes
 - **`make run` requires CRDs installed** — Run `make install` first
 - **Helm lint may not catch runtime issues** — Always test with actual CR apply
-- **Scorecard requires published bundle image** — Cannot run purely locally
+- **Scorecard runs against the pushed bundle image** — Pass `$(BUNDLE_IMG)` not `./bundle`; the operator-sdk pulls the image from the registry to execute tests
 - **E2E tests run on schedule** — Not on every PR; use Tier 1-3 for PR validation
 - **Test namespace matters** — Some RBAC is namespace-scoped; test in correct namespace

@@ -65,7 +65,7 @@ flowchart LR
 | `f5-cla.yml` | PRs | Verify contributor license agreement |
 | `create-operator-pr.yml` | External trigger | Auto-create PRs when upstream chart updates |
 | `update-openshift-versions.yml` | Manual/schedule | Update supported OpenShift version range |
-| `dependabot-auto-merge.yml` | Renovate PRs | Auto-merge dependency update PRs |
+| `dependabot-auto-merge.yml` | Dependabot PRs | Auto-merge dependency update PRs |
 | `stale.yml` | Schedule | Mark and close stale issues |
 
 ## Build System
