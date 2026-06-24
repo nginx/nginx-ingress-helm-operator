@@ -3,11 +3,11 @@
 # To re-generate a bundle for another specific version without changing the standard setup, you can:
 # - use the VERSION as arg of the bundle target (e.g make bundle VERSION=0.0.2)
 # - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
-VERSION ?= 3.6.0
+VERSION ?= 3.6.1
 
 # REPLACES defines the operator version that this version replaces for upgrades (OLM path).
 # Set to empty to disable (e.g make bundle REPLACES=)
-REPLACES ?= nginx-ingress-operator.v3.5.4
+REPLACES ?= nginx-ingress-operator.v3.6.0
 
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")
@@ -61,7 +61,7 @@ endif
 OPERATOR_SDK_VERSION ?= v1.42.2
 
 # renovate: datasource=github-releases depName=operator-registry packageName=operator-framework/operator-registry
-OPM_VERSION ?= v1.69.0
+OPM_VERSION ?= v1.72.0
 
 # Set the Kustomize version to use. By default, what is installed on the system is used.
 # This is useful for CI or a project to utilize a specific version of the kustomize toolkit.
