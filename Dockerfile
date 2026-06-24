@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.24
+# syntax=docker/dockerfile:1.25
 FROM quay.io/operator-framework/helm-operator:v1.42.2
 
 ENV HOME=/opt/helm
