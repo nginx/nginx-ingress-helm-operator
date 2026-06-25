@@ -50,9 +50,9 @@ flowchart TB
     WATCH --> RECONCILER
     RECONCILER --> OVERRIDE
     OVERRIDE -->|merge CR spec + overrides| HELM
-    HELM -->|render| VALUES
-    VALUES --> TEMPLATES
-    TEMPLATES --> CRDS
+    HELM -->|read defaults| VALUES
+    HELM -->|render| TEMPLATES
+    HELM -->|install CRDs| CRDS
     HELM -->|install/upgrade| NIC
     HELM -->|install/upgrade| SVC
     HELM -->|install/upgrade| RBAC_R

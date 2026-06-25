@@ -11,7 +11,7 @@ description: 'NGINX Ingress Helm Operator testing patterns including bundle vali
 |---------|---------|
 | `make bundle` | Regenerate and validate OLM bundle |
 | `operator-sdk bundle validate ./bundle` | Validate bundle structure and content |
-| `operator-sdk scorecard ./bundle` | Run OLM scorecard tests |
+| `operator-sdk scorecard $(BUNDLE_IMG)` | Run OLM scorecard tests (requires pushed bundle image) |
 | `make docker-build` | Build operator image (validates Dockerfile) |
 | `make install` | Install CRDs into test cluster |
 | `make deploy` | Deploy operator for manual testing |

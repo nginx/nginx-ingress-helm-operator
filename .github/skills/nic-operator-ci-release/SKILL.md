@@ -46,8 +46,10 @@ flowchart LR
 
     PR --> CI
     PUSH --> CI
+    TAG --> CI
     CI --> BUILD --> PUSH_IMG --> DRAFT
     SCHED --> E2E
+    MANUAL --> E2E
     E2E --> MINIKUBE --> DEPLOY_OP --> TEST_CR --> VALIDATE
     MANUAL --> Release
     Release --> TAG_CREATE --> REL_BUILD --> PUBLISH
@@ -58,7 +60,7 @@ flowchart LR
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
 | `ci.yml` | Push to main, PRs | Build multi-arch images, push to registries, create draft release |
-| `e2e-test.yml` | Daily schedule | End-to-end operator deployment test on Minikube |
+| `e2e-test.yml` | Daily schedule, manual dispatch, workflow_call | End-to-end operator deployment test on Minikube |
 | `release-operator.yml` | Manual dispatch | Create git tag and publish release images |
 | `scorecard.yml` | Weekly schedule | OpenSSF security scorecard analysis |
 | `dependency-review.yml` | PRs | Review dependency changes for vulnerabilities |

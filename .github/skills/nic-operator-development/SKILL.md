@@ -42,10 +42,9 @@ The most common development task. The chart at `helm-charts/nginx-ingress/` is s
 
 1. Update `VERSION` in `Makefile` (e.g., `3.6.0` → `3.7.0`)
 2. Update `REPLACES` in `Makefile` to previous version (e.g., `nginx-ingress-operator.v3.6.0`)
-3. Update `config/manager/manager.yaml` image tag
-4. Run `make bundle` to regenerate all OLM manifests
-5. Validate bundle
-6. Tag release: `git tag v3.7.0`
+3. Run `make bundle` to regenerate all OLM manifests (this patches the image in `config/manager/` via kustomize)
+4. Validate bundle
+5. Tag release: `git tag v3.7.0`
 
 ## Modifying RBAC
 
