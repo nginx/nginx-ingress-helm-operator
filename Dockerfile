@@ -13,7 +13,7 @@ RUN git init . && \
 RUN go mod download
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH make build/helm-operator
 
-FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2-1786398535
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2-1787204459
 
 # Update system packages to fix vulnerabilities
 USER root
