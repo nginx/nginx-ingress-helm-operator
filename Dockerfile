@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.26
-FROM --platform=$BUILDPLATFORM golang:1.26 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.27 AS builder
 ARG TARGETARCH
 ARG TARGETOS
 
@@ -13,7 +13,7 @@ RUN git init . && \
 RUN go mod download
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH make build/helm-operator
 
-FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2-1787204459
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2-1788137716
 
 # Update system packages to fix vulnerabilities
 USER root
