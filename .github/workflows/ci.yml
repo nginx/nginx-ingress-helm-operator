@@ -21,7 +21,7 @@ permissions:
 jobs:
   variables:
     name: Set Variables
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       runner: ${{ steps.vars.outputs.runner }}
       version: ${{ steps.vars.outputs.version }}
