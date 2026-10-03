@@ -66,7 +66,7 @@ OPM_VERSION ?= v1.74.0
 # Set the Kustomize version to use. By default, what is installed on the system is used.
 # This is useful for CI or a project to utilize a specific version of the kustomize toolkit.
 # renovate: datasource=github-releases depName=kustomize packageName=kubernetes-sigs/kustomize
-KUSTOMIZE_VERSION ?= 5.8.1
+KUSTOMIZE_VERSION ?= 5.8.2
 
 # Image URL to use all building/pushing image targets
 IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
