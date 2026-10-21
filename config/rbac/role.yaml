@@ -301,6 +301,7 @@ rules:
   - delete
 - apiGroups:
     - externaldns.nginx.org
+    - externaldns.k8s.io
   resources:
     - dnsendpoints
   verbs:
@@ -312,6 +313,7 @@ rules:
     - delete
 - apiGroups:
   - externaldns.nginx.org
+  - externaldns.k8s.io
   resources:
   - dnsendpoints/status
   verbs:
