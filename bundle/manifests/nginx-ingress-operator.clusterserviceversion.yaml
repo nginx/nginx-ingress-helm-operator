@@ -238,7 +238,7 @@ metadata:
     features.operators.openshift.io/token-auth-azure: "false"
     features.operators.openshift.io/token-auth-gcp: "false"
     operatorframework.io/suggested-namespace: nginx-ingress
-    operators.operatorframework.io/builder: operator-sdk-v1.40.0
+    operators.operatorframework.io/builder: operator-sdk-v1.42.3
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
     repository: https://github.com/nginx/nginx-ingress-helm-operator
     support: NGINX Inc.
@@ -521,6 +521,8 @@ spec:
     name: NGINX Inc
   maturity: alpha
   minKubeVersion: 1.26.0
+  replaces: nginx-ingress-operator.v3.7.3
   provider:
     name: NGINX Inc
+  skips: []
   version: 3.8.0
