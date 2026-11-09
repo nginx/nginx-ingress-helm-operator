@@ -11,10 +11,6 @@ on:
         description: "Operator version, e.g. x.y.z"
         type: string
         required: true
-      k8s_version:
-        description: "Kubernetes version, e.g. vx.y.z"
-        type: string
-        required: true
       dry_run:
         description: "Do not commit to a PR"
         type: boolean
@@ -28,10 +24,6 @@ on:
         required: true
       operator_version:
         description: "Operator version, e.g. x.y.z"
-        type: string
-        required: true
-      k8s_version:
-        description: "Kubernetes version, e.g. vx.y.z"
         type: string
         required: true
       dry_run:
@@ -54,15 +46,6 @@ jobs:
         with:
           repository: nginx/nginx-ingress-helm-operator
 
-      - name: Checkout Kubernetes json schemas
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: nginxinc/kubernetes-json-schema
-          path: schemas
-          token: ${{ secrets.GITHUB_TOKEN }}
-          sparse-checkout: |
-            ${{ inputs.k8s_version}}
-
       - name: Setup Helm
         uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
 
@@ -77,8 +60,6 @@ jobs:
 
           echo "Current working directory: $(pwd)"
           ls -l
-          echo "Contents of schema directory:"
-          ls -l schemas/
 
           cd helm-charts/
           rm -rf nginx-ingress
@@ -91,15 +72,12 @@ jobs:
           rm -f nginx-ingress/templates/controller-role.yaml
           rm -f nginx-ingress/templates/controller-rolebinding.yaml
           sed -i '14s/name: {{ include "nginx-ingress.fullname" . }}/name: nginx-ingress-operator-nginx-ingress-admin/' nginx-ingress/templates/clusterrolebinding.yaml
-          mkdir -p nginx-ingress/${{ inputs.k8s_version }}
-          mv ../schemas/${{ inputs.k8s_version }}/_definitions.json nginx-ingress/${{ inputs.k8s_version }}/_definitions.json
-          sed -i -e "s#ref\":.*_def#ref\": \"file://./helm-charts/nginx-ingress/${{ inputs.k8s_version }}/_def#" nginx-ingress/values.schema.json
-          rm -rf ../schemas
 
-          echo "Current working directory after removing schema: $(pwd)"
-          ls -l
-          echo "Contents of parent directory after removing schema:"
-          ls -l ../
+          # Helm only reads values.schema.json, so the chart must not need anything outside of it
+          if grep -n '"\$ref": "[^#]' nginx-ingress/values.schema.json; then
+            echo "::error::values.schema.json has a remote \$ref. Use a NGINX Ingress Controller chart with a self-contained schema."
+            exit 1
+          fi
 
           new_nic_version=$(yq e '.appVersion' nginx-ingress/Chart.yaml)
           echo "New NIC version: $new_nic_version"
@@ -158,6 +136,5 @@ jobs:
           git push origin update-nic-to-${{ steps.sync.outputs.new_nic_version }}
           gh pr create --title "Update NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}" --body "This automated PR updates the NGINX Ingress Controller to ${{ steps.sync.outputs.new_nic_version }}.
           The Helm Chart was updated to ${{ inputs.chart_version }}.
-          The Operator was updated to ${{ inputs.operator_version }}.
-          Kubernetes was updated to ${{ inputs.k8s_version }}."
+          The Operator was updated to ${{ inputs.operator_version }}."
         if: ${{ ! inputs.dry_run }}
