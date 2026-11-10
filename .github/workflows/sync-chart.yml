@@ -74,7 +74,7 @@ jobs:
           sed -i '14s/name: {{ include "nginx-ingress.fullname" . }}/name: nginx-ingress-operator-nginx-ingress-admin/' nginx-ingress/templates/clusterrolebinding.yaml
 
           # Helm only reads values.schema.json, so the chart must not need anything outside of it
-          if grep -n '"\$ref": "[^#]' nginx-ingress/values.schema.json; then
+          if grep -nE '"\$ref"[[:space:]]*:[[:space:]]*"[^#]' nginx-ingress/values.schema.json; then
             echo "::error::values.schema.json has a remote \$ref. Use a NGINX Ingress Controller chart with a self-contained schema."
             exit 1
           fi
