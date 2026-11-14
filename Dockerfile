@@ -40,6 +40,5 @@ LABEL name="nginx-ingress-operator" \
 
 COPY watches.yaml ${HOME}/watches.yaml
 COPY helm-charts  ${HOME}/helm-charts
-COPY helm-charts  /helm-charts
 
 ENTRYPOINT ["/usr/local/bin/helm-operator", "run", "--watches-file=./watches.yaml"]
